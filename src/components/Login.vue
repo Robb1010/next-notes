@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 <template>
   <div> 
     <el-container class="is-vertical window" v-if="loginVis"> 
@@ -13,7 +14,7 @@
             <el-input spellcheck="false" v-model="loginForm.username" placeholder="username"> </el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input type="password" v-model="loginForm.password" autocomplete="off"></el-input>
+            <el-input type="password" v-model="loginForm.password" autocomplete="off" @keyup.enter.native="submitForm('loginForm')"></el-input>
           </el-form-item>
           <el-alert
             v-if="error"
@@ -29,7 +30,7 @@
         </el-form>
       </el-container>
     </el-container>
-    <Main v-bind:notes="notes" v-if="!loginVis"/>
+    <Main v-bind:notes="mockNotes" v-if="!loginVis"/>
   </div>
 </template>
 
@@ -47,9 +48,20 @@ export default {
         password: '',
         keep: false
       },
-      loginVis: true,
+      loginVis: false,
       loading: false,
       error: false,
+     
+      mockNotes: [
+         // eslint-disable-next-line no-useless-escape
+        {"id":78094,"title":"#GitHub Series","modified":1614419301,"category":"","favorite":false,"error":false,"errorMessage":"","content":"#GitHub Series\n\nhttps:\/\/www.youtube.com\/watch?v=evgZPMWqpHc&list=PLzAGFfNxKFuZYVHQeb6Y4vc4hKgU7Kflo&index=1"},
+         // eslint-disable-next-line no-useless-escape
+        {"id":81009,"title":"Vue Electron","modified":1617725839,"category":"Test","favorite":false,"error":false,"errorMessage":"","content":"Testtttdsgsd\n\nhttps:\/\/www.smashingmagazine.com\/2020\/07\/desktop-apps-electron-vue-javascript\/\nElemnt ui: https:\/\/element.eleme.io\/?ref=madewithvuejs.com#\/en-US\/component\/layout\n\nFetch : \/index.php\/apps\/notes\/api\/v1\/notes\nFetch auth: Authorization: \"Basic \" + btoa(this.username + \":\" + this.password)\n"},
+         // eslint-disable-next-line no-useless-escape
+        {"id":78094,"title":"Nafadfsfd","modified":1614419301,"category":"","favorite":false,"error":false,"errorMessage":"","content":"Nlasda\n\nhttps:\/\/www.youtube.com\/watch?v=evgZPMWqpHc&list=PLzAGFfNxKFuZYVHQeb6Y4vc4hKgU7Kflo&index=1"},
+         // eslint-disable-next-line no-useless-escape
+        {"id":81009,"title":"Blahhhh","modified":1617725839,"category":"Test","favorite":false,"error":false,"errorMessage":"","content":"Vue Electron\n\nhttps:\/\/www.smashingmagazine.com\/2020\/07\/desktop-apps-electron-vue-javascript\/\nElemnt ui: https:\/\/element.eleme.io\/?ref=madewithvuejs.com#\/en-US\/component\/layout\n\nFetch : \/index.php\/apps\/notes\/api\/v1\/notes\nFetch auth: Authorization: \"Basic \" + btoa(this.username + \":\" + this.password)\n"}
+        ],
       notes: {empty: true},
       rules: {
         instance: [{
