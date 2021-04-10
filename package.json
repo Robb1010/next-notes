@@ -13,9 +13,15 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@adapttive/vue-markdown": "^4.0.1",
     "core-js": "~3.10.0",
     "element-ui": "~2.15.1",
-    "vue": "~2.6.12"
+    "highlight.js": "^10.7.2",
+    "keytar": "^7.6.0",
+    "markdown": "^0.5.0",
+    "marked": "^2.0.1",
+    "vue": "~2.6.12",
+    "vue-scroll-sync": "^1.0.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.12",

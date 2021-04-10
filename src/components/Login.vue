@@ -1,12 +1,13 @@
 /* eslint-disable no-useless-escape */
 <template>
-  <div> 
-    <el-container class="is-vertical window" v-if="loginVis"> 
-      <el-container class="is-vertical form-container"> 
+  <div>
+    <Header v-if="!loginVis"  @logOut="logOut" />
+    <el-container class="is-vertical window" v-if="loginVis">
+      <el-container class="is-vertical form-container">
         <h2>nextNotes</h2>
-        <el-form :model="loginForm" :rules="rules" ref="loginForm"  v-loading="loading"> 
+        <el-form :model="loginForm" :rules="rules" ref="loginForm"  v-loading="loading">
           <el-form-item prop="instance">
-            <el-input spellcheck="false" v-model="loginForm.instance" placeholder="yourinstance.domain"> 
+            <el-input spellcheck="false" v-model="loginForm.instance" placeholder="yourinstance.domain">
               <template slot="prepend">https://</template>
             </el-input>
           </el-form-item>
@@ -24,7 +25,7 @@
             effect="dark">
           </el-alert>
           <el-form-item>
-            <el-button class="login-btn" type="primary" @click="submitForm('loginForm')">Login</el-button>
+            <el-button ref="loginBtn" class="login-btn" type="primary" @click="submitForm('loginForm')">Login</el-button>
             <el-checkbox v-model="loginForm.keep">Keep me signed in</el-checkbox>
           </el-form-item>
         </el-form>
@@ -36,10 +37,13 @@
 
 <script>
 import Main from "./Main.vue";
+import Header from "./Header.vue";
+import { ipcRenderer } from "electron";
+
 
 export default {
   name: 'Login',
-  components: { Main },
+  components: { Main, Header },
   data() {
     return {
       loginForm: {
@@ -48,15 +52,15 @@ export default {
         password: '',
         keep: false
       },
-      loginVis: false,
+      loginVis: true,
       loading: false,
       error: false,
-     
+
       mockNotes: [
          // eslint-disable-next-line no-useless-escape
-        {"id":78094,"title":"#GitHub Series","modified":1614419301,"category":"","favorite":false,"error":false,"errorMessage":"","content":"#GitHub Series\n\nhttps:\/\/www.youtube.com\/watch?v=evgZPMWqpHc&list=PLzAGFfNxKFuZYVHQeb6Y4vc4hKgU7Kflo&index=1"},
+        {"id":78095,"title":"#GitHub Series","modified":1614419301,"category":"","favorite":false,"error":false,"errorMessage":"","content":"# GitHub Series\n\nhttps:\/\/www.youtube.com\/watch?v=evgZPMWqpHc&list=PLzAGFfNxKFuZYVHQeb6Y4vc4hKgU7Kflo&index=1"},
          // eslint-disable-next-line no-useless-escape
-        {"id":81009,"title":"Vue Electron","modified":1617725839,"category":"Test","favorite":false,"error":false,"errorMessage":"","content":"Testtttdsgsd\n\nhttps:\/\/www.smashingmagazine.com\/2020\/07\/desktop-apps-electron-vue-javascript\/\nElemnt ui: https:\/\/element.eleme.io\/?ref=madewithvuejs.com#\/en-US\/component\/layout\n\nFetch : \/index.php\/apps\/notes\/api\/v1\/notes\nFetch auth: Authorization: \"Basic \" + btoa(this.username + \":\" + this.password)\n"},
+        {"id":81001,"title":"Vue Electron","modified":1617725839,"category":"Test","favorite":false,"error":false,"errorMessage":"","content":"Testtttdsgsd\n\nhttps:\/\/www.smashingmagazine.com\/2020\/07\/desktop-apps-electron-vue-javascript\/\nElemnt ui: https:\/\/element.eleme.io\/?ref=madewithvuejs.com#\/en-US\/component\/layout\n\nFetch : \/index.php\/apps\/notes\/api\/v1\/notes\nFetch auth: Authorization: \"Basic \" + btoa(this.username + \":\" + this.password)\n"},
          // eslint-disable-next-line no-useless-escape
         {"id":78094,"title":"Nafadfsfd","modified":1614419301,"category":"","favorite":false,"error":false,"errorMessage":"","content":"Nlasda\n\nhttps:\/\/www.youtube.com\/watch?v=evgZPMWqpHc&list=PLzAGFfNxKFuZYVHQeb6Y4vc4hKgU7Kflo&index=1"},
          // eslint-disable-next-line no-useless-escape
@@ -111,13 +115,18 @@ export default {
                 return false;
               }
             })
-            .then(res => {
+            .then(async res => {
               // TODO
               // Add password saving if keep is ticked
-              console.log(res);
               this.notes = res;
               this.loading = false;
-              })
+              if(form.keep) {
+                ipcRenderer.invoke('get-password', form.username)
+                .then(res => console.log(res))
+                .catch(err => console.log(err));
+                await ipcRenderer.send('set-password', `${form.username}|${form.instance}`, form.password);
+              }
+            })
             .catch(err => {
               this.loading = false;
               this.error = true;
@@ -128,7 +137,34 @@ export default {
           return false;
         }
       })
+    },
+
+    logOut: function() {
+      const username = `${this.loginForm.username}|${this.loginForm.instance}`;
+      console.log("username");
+      ipcRenderer.invoke('delete-account', username)
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
+      this.loginVis = true;
     }
+
+
+  },
+
+  mounted: function() {
+    ipcRenderer.invoke('find-all')
+    .then( res => {
+        const instPass = res[0].account.split('|');
+        const instance = instPass[1];
+        const username = instPass[0];
+        const passwd = res[0].password;
+        this.loginForm = {instance: instance, username: username, password: passwd, keep: false};
+        setTimeout(() => this.$refs.loginBtn.$listeners.click(), 100 );
+
+    })
+    .catch(err => {
+      console.log(err);
+    });
   }
 }
 </script>
