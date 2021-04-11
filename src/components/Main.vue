@@ -1,29 +1,41 @@
 <template>
+<div>
+  <el-container>
+    <Aside v-bind:categories="categories" v-bind:notes="notes" @option="option" />
+    <el-container direction="vertical">
 
-    <div>
-      <el-container>
-      <el-aside class="aside" width="230px">
-        <el-menu>
-      <el-submenu :index="index.toString()" v-for="(category, index) in categories" :key="index">
-        <template #title>{{category === '' ? "Unassigned" : category}}</template>
-         <el-menu-item-group >
-           <template v-for="(note, index) in notes">
-           <el-menu-item @click="option(note)" :index="category + '-' + index" v-if="note.category === category" :key="index"> {{note.title}} </el-menu-item>
-           </template>
-        </el-menu-item-group>
-      </el-submenu>
-        </el-menu>
-      </el-aside>
-      <el-container direction="vertical">
       <el-header>
-         <el-tooltip class="item" effect="dark" content="Cycle through views" placement="top-start">
-        <div class="switcher" @click="cycleView">
-          <i class="el-icon-c-scale-to-original"> </i>
-          <i class="el-icon-edit-outline"> </i>
-          <i class="el-icon-view"> </i>
-        </div>
-      </el-tooltip>
+        <el-container class="title" direction="horizontal">
+          <p v-if="!editingTitle" v-html="note.title" />
+          <el-input class="title-input" v-if="editingTitle" @keyup.enter.native="editTitle" v-bind:value="titleValue" @input="changeTitle"></el-input>
+          <el-tooltip effect="dark" content="Edit title" placement="right" v-if="!editingTitle && note.title">
+            <i class="el-icon-edit" @click="editTitle" />
+          </el-tooltip>
+          <i class="el-icon-right" @click="editTitle" v-if="editingTitle" />
+        </el-container>
+        <el-popover placement="top" width="160" v-model="deletePop">
+          <p>Are you sure to delete this?</p>
+          <div style="text-align: right; margin: 0">
+            <el-button size="mini" type="text" @click="deletePop = false">No</el-button>
+            <el-button type="danger" size="mini" @click="deleteItem">Yes</el-button>
+          </div>
+          <i slot="reference" class="el-icon-delete" />
+        </el-popover>
+        <el-tooltip effect="dark" content="Cycle through views" placement="top-start">
+          <div class="switcher" @click="cycleView">
+            <i class="el-icon-c-scale-to-original"> </i>
+            <i class="el-icon-edit-outline"> </i>
+            <i class="el-icon-view"> </i>
+          </div>
+        </el-tooltip>
+        <el-tooltip effect="dark" class="save-to-cloud" content="Save to cloud" placement="top-start">
+          <div @click="saveToCloud">
+            <i class="el-icon-upload" v-if="!saving"> </i>
+            <i class="el-icon-loading" v-if="saving"> </i>
+          </div>
+        </el-tooltip>
       </el-header>
+
       <el-row :gutter="20">
         <el-col :md="{span: span}" :sm="{span: 24}" v-if="editorVisibility">
           <MDEditor v-bind:content="active" @textArea="textUpdate" @scrolled="scroll" :key="activeKey" />
@@ -32,118 +44,234 @@
           <MDViewer v-bind:content="active" v-bind:scrollTo="scrollTo" />
         </el-col>
       </el-row>
-      </el-container>
-      </el-container>
-        </div>
+    </el-container>
+  </el-container>
+</div>
 </template>
 
 <script>
 import MDEditor from "./MDEditor.vue";
 import MDViewer from "./MDViewer.vue";
+import Aside from "./Aside.vue"
 
 export default {
-    name: "Main",
-    components: { MDEditor, MDViewer },
-    props: ['notes', 'loginVis'],
+  name: "Main",
+  components: {
+    MDEditor,
+    MDViewer,
+    Aside
+  },
+  props: ['notes', 'loginVis', 'creds'],
 
-    data () {
-      return {
-        categories: [""],
-        active: "",
-        activeKey: "",
-        scrollTo: 0,
-        span: 12,
-        editorVisibility: true,
-        viewerVisibility: true,
-        viewCycle: 0
+  data() {
+    return {
+      categories: [""],
+      active: "",
+      activeKey: -1,
+      scrollTo: 0,
+      span: 12,
+      editorVisibility: true,
+      viewerVisibility: true,
+      viewCycle: 0,
+      saving: false,
+      note: {},
+      editingTitle: false,
+      titleValue: "asds",
+      deletePop: false,
+    }
+  },
+
+  methods: {
+    option: function(note) {
+      this.active = note.content;
+      this.activeKey = note.id;
+      this.note = note;
+      this.editingTitle = false;
+    },
+
+    textUpdate: function(value) {
+      this.active = value;
+    },
+
+    scroll: function(value) {
+      this.scrollTo = value;
+    },
+
+    cycleView: function() {
+      if (this.viewCycle === 0) {
+        this.viewCycle = 1;
+        this.span = 24;
+        this.viewerVisibility = false;
+      } else if (this.viewCycle === 1) {
+        this.viewCycle = 2;
+        this.editorVisibility = false;
+        this.viewerVisibility = true;
+      } else if (this.viewCycle === 2) {
+        this.viewCycle = 0;
+        this.editorVisibility = true;
+        this.viewerVisibility = true;
+        this.span = 12;
       }
     },
 
-    methods: {
-      option: function(note) {
-        this.active = note.content;
-        this.activeKey = note.id;
-      },
+    callCloud: async function(method, body) {
+      const {
+        instance,
+        username,
+        password
+      } = this.creds;
 
-      textUpdate: function(value) {
-        this.active = value;
-      },
+      await fetch(`https://${instance}/index.php/apps/notes/api/v1/notes/${this.activeKey}`, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: "Basic " + btoa(username + ":" + password)
+          },
+          body: JSON.stringify(body)
+        })
+        .then(res => {
+          console.log(res);
+          this.saving = false;
+        })
+        .catch(err => {
+          console.log(err);
+          this.saving = false;
+        });
+    },
 
-      scroll: function(value) {
-        this.scrollTo = value;
-      },
+    editTitle: function() {
+      if (!this.editingTitle) {
+        this.titleValue = this.note.title;
+      }
+      if (this.editingTitle) {
+        this.saving = true;
+        this.callCloud('PUT', {
+          title: this.titleValue
+        });
+      }
+      this.editingTitle = !this.editingTitle;
+    },
 
-      cycleView: function() {
-        if(this.viewCycle === 0) {
-          this.viewCycle = 1;
-          this.span = 24;
-          this.viewerVisibility = false;
-        } else if(this.viewCycle === 1) {
-          this.viewCycle = 2;
-          this.editorVisibility = false;
-          this.viewerVisibility = true;
-        } else if(this.viewCycle === 2) {
-          this.viewCycle = 0;
-          this.editorVisibility = true;
-          this.viewerVisibility = true;
-          this.span = 12;
+    changeTitle: function(event) {
+      this.titleValue = event;
+      console.log(this.titleValue);
+    },
+
+    saveToCloud: async function() {
+      if (!this.saving && this.activeKey !== -1) {
+        this.saving = true;
+
+        this.callCloud('PUT', {
+          content: this.active
+        });
+      }
+    },
+
+    deleteItem: function() {
+      this.saving = true;
+      this.deletePop = false;
+      this.callCloud('DELETE', {});
+    }
+  },
+
+
+
+  computed: {
+    getTitle: function() {
+      return (note, category) => {
+        if (note.category === category) {
+          return note.title
         }
-      }
-    },
+      };
+    }
+  },
 
-    computed: {
-     getTitle: function () {
-       return (note, category) => {if(note.category === category) {return note.title}};
-     }
-    },
-
-    beforeMount: function() {
+  beforeMount: function() {
+    console.log(this.creds);
+    if (this.notes.length > 0) {
       this.notes.map(item => {
-        if(item.category != "" && this.categories.indexOf(item.category) < 0) {
+        if (item.category != "" && this.categories.indexOf(item.category) < 0) {
           this.categories.push(item.category);
         }
       });
-    },
+    }
+  },
 
 
 }
 </script>
 
 <style scoped>
-  .aside {
-    border-right-style: solid;
-    border-width: 1px;
-    border-color: #DCDFE6;
-  }
+.aside {
+  border-right-style: solid;
+  border-width: 1px;
+  border-color: #DCDFE6;
+}
 
-  .el-menu {
-    border-right: 0px;
-  }
+.el-menu {
+  border-right: 0px;
+}
 
-  .el-row {
-    width: 100%;
-  }
+.el-row {
+  width: 100%;
+}
 
-  .el-header {
-    height: 40px !important;
-    border-bottom-style: solid;
-    border-width: 1px;
-    border-color: #DCDFE6;
-  }
+.el-header {
+  height: 50px !important;
+  border-bottom-style: solid;
+  border-width: 1px;
+  border-color: #DCDFE6;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 
-  .switcher {
-    width: 40px;
-    height: 30px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 5px;
-  }
+.title {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
 
-  .switcher:hover {
-    color: #409EFF;
-    cursor: pointer;
-  }
+.title-input {
+  width: 250px;
+}
 
 
+.el-icon-right {
+  font-size: 1.3rem;
+}
+
+.el-icon-delete {
+  font-size: 1.5rem;
+  margin-right: 20px;
+}
+
+.switcher {
+  width: 40px;
+  height: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.el-tooltip {
+  width: 40px;
+}
+
+.el-icon-upload {
+  font-size: 2rem;
+}
+
+.save-to-cloud,
+.el-icon-edit {
+  margin-left: 20px;
+}
+
+.el-tooltip:hover,
+.el-icon-right:hover,
+.el-icon-delete:hover {
+  color: #409EFF;
+  cursor: pointer;
+}
 </style>

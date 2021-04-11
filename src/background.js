@@ -1,15 +1,28 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import {
+  app,
+  protocol,
+  BrowserWindow,
+  ipcMain
+} from 'electron'
+import {
+  createProtocol
+} from 'vue-cli-plugin-electron-builder/lib'
+import installExtension, {
+  VUEJS_DEVTOOLS
+} from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 import keytar from 'keytar';
 
 // Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true } }
-])
+protocol.registerSchemesAsPrivileged([{
+  scheme: 'app',
+  privileges: {
+    secure: true,
+    standard: true
+  }
+}])
 
 async function createWindow() {
   // Create the browser window.
@@ -17,7 +30,7 @@ async function createWindow() {
     width: 1100,
     height: 700,
     webPreferences: {
-
+      webSecurity: false,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
@@ -69,8 +82,8 @@ app.on('ready', async () => {
 
 
 ipcMain.handle('delete-account', async (event, account) => {
-    const delAccount = await keytar.deletePassword('nextNotes', account);
-    return delAccount;
+  const delAccount = await keytar.deletePassword('nextNotes', account);
+  return delAccount;
 
 });
 
@@ -79,9 +92,10 @@ ipcMain.handle('find-all', async (event) => {
   return all;
 });
 
- ipcMain.on('set-password', async (event, user, pass) => {
-    await keytar.setPassword('nextNotes', user, pass)
+ipcMain.on('set-password', async (event, user, pass) => {
+  await keytar.setPassword('nextNotes', user, pass)
 });
+
 
 
 

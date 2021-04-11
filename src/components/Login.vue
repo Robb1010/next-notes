@@ -1,72 +1,63 @@
 /* eslint-disable no-useless-escape */
 <template>
-  <div>
-    <Header v-if="!loginVis"  @logOut="logOut" />
-    <el-container class="is-vertical window" v-if="loginVis">
-      <el-container class="is-vertical form-container">
-        <h2>nextNotes</h2>
-        <el-form :model="loginForm" :rules="rules" ref="loginForm"  v-loading="loading">
-          <el-form-item prop="instance">
-            <el-input spellcheck="false" v-model="loginForm.instance" placeholder="yourinstance.domain">
-              <template slot="prepend">https://</template>
-            </el-input>
-          </el-form-item>
-          <el-form-item prop="username">
-            <el-input spellcheck="false" v-model="loginForm.username" placeholder="username"> </el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input type="password" v-model="loginForm.password" autocomplete="off" @keyup.enter.native="submitForm('loginForm')"></el-input>
-          </el-form-item>
-          <el-alert
-            v-if="error"
-            class="error-alert"
-            title="Invalid credentials"
-            type="error"
-            effect="dark">
-          </el-alert>
-          <el-form-item>
-            <el-button ref="loginBtn" class="login-btn" type="primary" @click="submitForm('loginForm')">Login</el-button>
-            <el-checkbox v-model="loginForm.keep">Keep me signed in</el-checkbox>
-          </el-form-item>
-        </el-form>
-      </el-container>
+<div>
+  <Header v-if="!loginVis" @logOut="logOut" />
+  <el-container class="is-vertical window" v-if="loginVis">
+    <el-container class="is-vertical form-container">
+      <h2>nextNotes</h2>
+      <el-form :model="loginForm" :rules="rules" ref="loginForm" v-loading="loading">
+        <el-form-item prop="instance">
+          <el-input spellcheck="false" v-model="loginForm.instance" placeholder="yourinstance.domain">
+            <template slot="prepend">https://</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="username">
+          <el-input spellcheck="false" v-model="loginForm.username" placeholder="username"> </el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input type="password" v-model="loginForm.password" autocomplete="off" @keyup.enter.native="submitForm('loginForm')"></el-input>
+        </el-form-item>
+        <el-alert v-if="error" class="error-alert" title="Invalid credentials" type="error" effect="dark">
+        </el-alert>
+        <el-form-item>
+          <el-button ref="loginBtn" class="login-btn" type="primary" @click="submitForm('loginForm')">Login</el-button>
+          <el-checkbox v-model="loginForm.keep">Keep me signed in</el-checkbox>
+        </el-form-item>
+      </el-form>
     </el-container>
-    <Main v-bind:notes="mockNotes" v-if="!loginVis"/>
-  </div>
+  </el-container>
+  <Main v-bind:notes="notes" v-bind:creds="loginForm" v-if="!loginVis" />
+</div>
 </template>
 
 <script>
 import Main from "./Main.vue";
 import Header from "./Header.vue";
-import { ipcRenderer } from "electron";
+import {
+  ipcRenderer
+} from "electron";
 
 
 export default {
   name: 'Login',
-  components: { Main, Header },
+  components: {
+    Main,
+    Header
+  },
   data() {
     return {
       loginForm: {
         instance: 'nextcloud.robertsoldan.com',
         username: 'robert',
         password: '',
-        keep: false
+        keep: false,
       },
       loginVis: true,
       loading: false,
       error: false,
-
-      mockNotes: [
-         // eslint-disable-next-line no-useless-escape
-        {"id":78095,"title":"#GitHub Series","modified":1614419301,"category":"","favorite":false,"error":false,"errorMessage":"","content":"# GitHub Series\n\nhttps:\/\/www.youtube.com\/watch?v=evgZPMWqpHc&list=PLzAGFfNxKFuZYVHQeb6Y4vc4hKgU7Kflo&index=1"},
-         // eslint-disable-next-line no-useless-escape
-        {"id":81001,"title":"Vue Electron","modified":1617725839,"category":"Test","favorite":false,"error":false,"errorMessage":"","content":"Testtttdsgsd\n\nhttps:\/\/www.smashingmagazine.com\/2020\/07\/desktop-apps-electron-vue-javascript\/\nElemnt ui: https:\/\/element.eleme.io\/?ref=madewithvuejs.com#\/en-US\/component\/layout\n\nFetch : \/index.php\/apps\/notes\/api\/v1\/notes\nFetch auth: Authorization: \"Basic \" + btoa(this.username + \":\" + this.password)\n"},
-         // eslint-disable-next-line no-useless-escape
-        {"id":78094,"title":"Nafadfsfd","modified":1614419301,"category":"","favorite":false,"error":false,"errorMessage":"","content":"Nlasda\n\nhttps:\/\/www.youtube.com\/watch?v=evgZPMWqpHc&list=PLzAGFfNxKFuZYVHQeb6Y4vc4hKgU7Kflo&index=1"},
-         // eslint-disable-next-line no-useless-escape
-        {"id":81009,"title":"Blahhhh","modified":1617725839,"category":"Test","favorite":false,"error":false,"errorMessage":"","content":"Vue Electron\n\nhttps:\/\/www.smashingmagazine.com\/2020\/07\/desktop-apps-electron-vue-javascript\/\nElemnt ui: https:\/\/element.eleme.io\/?ref=madewithvuejs.com#\/en-US\/component\/layout\n\nFetch : \/index.php\/apps\/notes\/api\/v1\/notes\nFetch auth: Authorization: \"Basic \" + btoa(this.username + \":\" + this.password)\n"}
-        ],
-      notes: {empty: true},
+      notes: {
+        empty: true
+      },
       rules: {
         instance: [{
             required: true,
@@ -100,31 +91,30 @@ export default {
           this.error = false;
           const form = this.loginForm;
           await fetch(`https://${form.instance}/index.php/apps/notes/api/v1/notes`, {
-            headers: {
-              Authorization: "Basic " + btoa(form.username + ":" + form.password)
-            }
-          })
+              headers: {
+                Authorization: "Basic " + btoa(form.username + ":" + form.password)
+              }
+            })
             .then(res => {
-              if(res.ok) {
-                this.loading = false;
-                this.loginVis = false;
+              if (res.status === 200) {
                 return res.json();
               } else {
-                this.loading = false;
                 this.error = true;
-                return false;
+                return res.json;
               }
             })
             .then(async res => {
-              // TODO
-              // Add password saving if keep is ticked
-              this.notes = res;
-              this.loading = false;
-              if(form.keep) {
-                ipcRenderer.invoke('get-password', form.username)
-                .then(res => console.log(res))
-                .catch(err => console.log(err));
-                await ipcRenderer.send('set-password', `${form.username}|${form.instance}`, form.password);
+              if (this.error) {
+                this.loading = false;
+              } else {
+                console.log(res);
+                this.notes = res;
+                this.loading = false;
+                this.loginVis = false;
+                this.loading = false;
+                if (form.keep) {
+                  await ipcRenderer.send('set-password', `${form.username}|${form.instance}`, form.password);
+                }
               }
             })
             .catch(err => {
@@ -143,35 +133,37 @@ export default {
       const username = `${this.loginForm.username}|${this.loginForm.instance}`;
       console.log("username");
       ipcRenderer.invoke('delete-account', username)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
       this.loginVis = true;
     }
-
-
   },
 
   mounted: function() {
     ipcRenderer.invoke('find-all')
-    .then( res => {
+      .then(res => {
         const instPass = res[0].account.split('|');
         const instance = instPass[1];
         const username = instPass[0];
         const passwd = res[0].password;
-        this.loginForm = {instance: instance, username: username, password: passwd, keep: false};
-        setTimeout(() => this.$refs.loginBtn.$listeners.click(), 100 );
+        this.loginForm = {
+          instance: instance,
+          username: username,
+          password: passwd,
+          keep: false
+        };
+        setTimeout(() => this.$refs.loginBtn.$listeners.click(), 100);
 
-    })
-    .catch(err => {
-      console.log(err);
-    });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 .window {
   align-items: center;
   height: 100vh;
@@ -191,5 +183,4 @@ export default {
 .login-btn {
   margin-right: 20px;
 }
-
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <div id="app">
-    <Login />
-  </div>
+<div id="app">
+  <Login />
+</div>
 </template>
 
 <script>
@@ -14,7 +14,9 @@ const routes = {
 }
 
 export default {
-  components: { Login },
+  components: {
+    Login
+  },
   name: 'app',
   data() {
     return {
@@ -27,7 +29,9 @@ export default {
       return routes[this.currentRoute] || Login
     }
   },
-  render () { return this.ViewComponent }
+  render() {
+    return this.ViewComponent
+  }
 }
 </script>
 
@@ -36,7 +40,9 @@ body {
   margin: 0 !important;
 }
 
-table, td, th {
+table,
+td,
+th {
   padding: 10px;
   margin: 20px;
   border-collapse: collapse;

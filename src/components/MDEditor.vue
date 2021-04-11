@@ -13,7 +13,7 @@
  <script>
   export default {
     name: "MDEditor",
-    props: ['content'],
+    props: ['content'], 
 
     data: function () {
       return {
