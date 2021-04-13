@@ -26,7 +26,7 @@
       </el-form>
     </el-container>
   </el-container>
-  <Main v-bind:notes="notes" v-bind:creds="loginForm" v-if="!loginVis" />
+  <Main v-bind:notes="notes" v-bind:creds="loginForm" v-if="!loginVis" @add="addNote" @deleteNote="deleteNote" />
 </div>
 </template>
 
@@ -100,14 +100,13 @@ export default {
                 return res.json();
               } else {
                 this.error = true;
-                return res.json;
+                return res.json();
               }
             })
             .then(async res => {
               if (this.error) {
                 this.loading = false;
               } else {
-                console.log(res);
                 this.notes = res;
                 this.loading = false;
                 this.loginVis = false;
@@ -136,6 +135,20 @@ export default {
         .then(res => console.log(res))
         .catch(err => console.log(err));
       this.loginVis = true;
+    },
+
+    addNote: function(note) {
+      this.notes.unshift(note);
+    },
+
+    deleteNote: function(noteKey) {
+      console.log(this.notes);
+      this.notes.map((note, index) => {
+        if (note.id === noteKey) {
+          this.notes.splice(index, 1);
+          console.log(this.notes);
+        }
+      })
     }
   },
 

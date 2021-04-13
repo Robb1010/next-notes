@@ -4,7 +4,8 @@ import {
   app,
   protocol,
   BrowserWindow,
-  ipcMain
+  ipcMain,
+  shell
 } from 'electron'
 import {
   createProtocol
@@ -14,6 +15,8 @@ import installExtension, {
 } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 import keytar from 'keytar';
+
+
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{
@@ -37,8 +40,6 @@ async function createWindow() {
     }
   })
 
-
-
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -48,7 +49,18 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  let wc = win.webContents
+  wc.on('will-navigate', function(e, url) {
+    if (url != wc.getURL()) {
+      e.preventDefault()
+      shell.openExternal(url)
+    }
+  })
+
 }
+
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -95,8 +107,6 @@ ipcMain.handle('find-all', async (event) => {
 ipcMain.on('set-password', async (event, user, pass) => {
   await keytar.setPassword('nextNotes', user, pass)
 });
-
-
 
 
 // Exit cleanly on request from parent process in development mode.

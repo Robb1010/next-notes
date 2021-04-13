@@ -1,7 +1,7 @@
 <template>
 <div>
   <el-container>
-    <Aside v-bind:categories="categories" v-bind:notes="notes" @option="option" />
+    <Aside v-bind:categories="categories" v-bind:notes="notes" @newNote="newNote" @option="option" />
     <el-container direction="vertical">
 
       <el-header>
@@ -76,7 +76,7 @@ export default {
       saving: false,
       note: {},
       editingTitle: false,
-      titleValue: "asds",
+      titleValue: "",
       deletePop: false,
     }
   },
@@ -91,6 +91,7 @@ export default {
 
     textUpdate: function(value) {
       this.active = value;
+      this.note.content = value;
     },
 
     scroll: function(value) {
@@ -148,13 +149,13 @@ export default {
         this.callCloud('PUT', {
           title: this.titleValue
         });
+        this.note.title = this.titleValue;
       }
       this.editingTitle = !this.editingTitle;
     },
 
     changeTitle: function(event) {
       this.titleValue = event;
-      console.log(this.titleValue);
     },
 
     saveToCloud: async function() {
@@ -164,6 +165,8 @@ export default {
         this.callCloud('PUT', {
           content: this.active
         });
+
+        this.note.content = this.active;
       }
     },
 
@@ -171,10 +174,53 @@ export default {
       this.saving = true;
       this.deletePop = false;
       this.callCloud('DELETE', {});
-    }
+      this.$emit('deleteNote', this.activeKey);
+      this.activeKey = -1;
+    },
+
+    newNote: async function() {
+      this.saving = true;
+      const {
+        instance,
+        username,
+        password
+      } = this.creds;
+
+      await fetch(`https://${instance}/index.php/apps/notes/api/v1/notes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: "Basic " + btoa(username + ":" + password)
+          },
+          body: JSON.stringify({
+            title: "New note",
+            content: "Type your note...",
+            favorite: false,
+            category: ""
+          })
+        })
+        .then(res => {
+          return res.json();
+        })
+        .then(data => {
+          this.saving = false;
+          this.activeKey = data.id;
+          this.active = data.content;
+          this.note = {
+            id: data.id,
+            title: data.title,
+            content: data.content,
+            favorite: false,
+            category: ""
+          }
+          this.$emit('add', this.note);
+        })
+        .catch(err => {
+          this.saving = false;
+          console.log(err);
+        });
+    },
   },
-
-
 
   computed: {
     getTitle: function() {
@@ -186,18 +232,17 @@ export default {
     }
   },
 
-  beforeMount: function() {
-    console.log(this.creds);
-    if (this.notes.length > 0) {
-      this.notes.map(item => {
-        if (item.category != "" && this.categories.indexOf(item.category) < 0) {
-          this.categories.push(item.category);
-        }
-      });
+  watch: {
+    "notes": function() {
+      if (this.notes.length > 0) {
+        this.notes.map(item => {
+          if (item.category != "" && this.categories.indexOf(item.category) < 0) {
+            this.categories.push(item.category);
+          }
+        });
+      }
     }
-  },
-
-
+  }
 }
 </script>
 
