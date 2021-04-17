@@ -1,5 +1,5 @@
 <template>
-<el-main v-html="mdToHTML" direction="vertical" v-on:scroll.native="scroll" id="reader"></el-main>
+<el-main v-html="mdToHTML" direction="vertical" id="reader"></el-main>
 </template>
 
 <script>
@@ -10,12 +10,6 @@ export default {
   name: "MDViewer",
   props: ['content', 'scrollTo'],
 
-  methods: {
-    scroll: function(event) {
-      console.log((event.target.scrollTop * 100) / event.target.scrollHeight);
-    }
-  },
-
   computed: {
     mdToHTML: function() {
       return marked(this.content);
@@ -25,7 +19,6 @@ export default {
   watch: {
     scrollTo: function() {
       const reader = document.getElementById("reader");
-      console.log(reader.scrollDown);
       const targetPos = this.scrollTo * reader.scrollHeight / 100;
       reader.scrollTo(0, targetPos);
     }

@@ -38,10 +38,10 @@
 
       <el-row :gutter="20">
         <el-col :md="{span: span}" :sm="{span: 24}" v-if="editorVisibility">
-          <MDEditor v-bind:content="active" @textArea="textUpdate" @scrolled="scroll" :key="activeKey" />
+          <MDEditor v-bind:content="note.content" @textArea="textUpdate" @scrolled="scroll" :key="activeKey" />
         </el-col>
         <el-col :md="{span: span}" :sm="{span: 24}" v-if="viewerVisibility">
-          <MDViewer v-bind:content="active" v-bind:scrollTo="scrollTo" />
+          <MDViewer v-bind:content="note.content" v-bind:scrollTo="scrollTo" />
         </el-col>
       </el-row>
     </el-container>
@@ -74,26 +74,19 @@ export default {
       viewerVisibility: true,
       viewCycle: 0,
       saving: false,
-      note: {},
+      note: {
+        content: "",
+        title: ""
+      },
       editingTitle: false,
       titleValue: "",
       deletePop: false,
+      timer: false,
+      timeouts: []
     }
   },
 
   methods: {
-    option: function(note) {
-      this.active = note.content;
-      this.activeKey = note.id;
-      this.note = note;
-      this.editingTitle = false;
-    },
-
-    textUpdate: function(value) {
-      this.active = value;
-      this.note.content = value;
-    },
-
     scroll: function(value) {
       this.scrollTo = value;
     },
@@ -115,14 +108,14 @@ export default {
       }
     },
 
-    callCloud: async function(method, body) {
+    callCloud: async function(method, id, body) {
       const {
         instance,
         username,
         password
       } = this.creds;
 
-      await fetch(`https://${instance}/index.php/apps/notes/api/v1/notes/${this.activeKey}`, {
+      await fetch(`https://${instance}/index.php/apps/notes/api/v1/notes/${id.toString()}`, {
           method: method,
           headers: {
             'Content-Type': 'application/json',
@@ -146,7 +139,7 @@ export default {
       }
       if (this.editingTitle) {
         this.saving = true;
-        this.callCloud('PUT', {
+        this.callCloud('PUT', this.activeKey, {
           title: this.titleValue
         });
         this.note.title = this.titleValue;
@@ -158,22 +151,19 @@ export default {
       this.titleValue = event;
     },
 
-    saveToCloud: async function() {
+    saveToCloud: async function(event, id, body) {
       if (!this.saving && this.activeKey !== -1) {
         this.saving = true;
-
-        this.callCloud('PUT', {
-          content: this.active
+        this.callCloud('PUT', id, {
+          content: body
         });
-
-        this.note.content = this.active;
       }
     },
 
     deleteItem: function() {
       this.saving = true;
       this.deletePop = false;
-      this.callCloud('DELETE', {});
+      this.callCloud('DELETE', this.activeKey, {});
       this.$emit('deleteNote', this.activeKey);
       this.activeKey = -1;
     },
@@ -205,7 +195,7 @@ export default {
         .then(data => {
           this.saving = false;
           this.activeKey = data.id;
-          this.active = data.content;
+          this.note.content = data.content;
           this.note = {
             id: data.id,
             title: data.title,
@@ -219,6 +209,42 @@ export default {
           this.saving = false;
           console.log(err);
         });
+    },
+
+    setTimer: function() {
+      this.timer = !this.timer;
+    },
+
+    textUpdate: function(value) {
+      this.note.content = value;
+
+      if (!this.timer) {
+        this.timer = true;
+        const params = {
+          id: this.activeKey
+        };
+
+        this.timeouts[this.activeKey.toString()] = setTimeout(function() {
+          this.setTimer();
+          let content = "";
+          this.notes.map(note => {
+            if (note.id === params.id) {
+              content = note.content;
+            }
+          });
+          this.saveToCloud(null, params.id, content);
+
+        }.bind(this), 10000, params);
+
+        console.log(this.timeouts);
+      }
+    },
+
+    option: function(note) {
+      this.timer = false;
+      this.activeKey = note.id;
+      this.note = note;
+      this.editingTitle = false;
     },
   },
 

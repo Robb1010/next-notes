@@ -142,11 +142,9 @@ export default {
     },
 
     deleteNote: function(noteKey) {
-      console.log(this.notes);
       this.notes.map((note, index) => {
         if (note.id === noteKey) {
           this.notes.splice(index, 1);
-          console.log(this.notes);
         }
       })
     }
