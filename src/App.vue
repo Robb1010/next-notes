@@ -57,4 +57,26 @@ th {
   margin: 0;
   padding: 0;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #DCDFE6;
+
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+  background: #DCDFE6;
+}
 </style>
