@@ -16,7 +16,7 @@ import installExtension, {
 const isDevelopment = process.env.NODE_ENV !== 'production'
 import keytar from 'keytar';
 
-
+//const path = require('path');
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{
@@ -34,9 +34,8 @@ async function createWindow() {
     height: 700,
     webPreferences: {
       webSecurity: false,
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
+      //preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
     }
   })
 
@@ -99,7 +98,7 @@ ipcMain.handle('delete-account', async (event, account) => {
 
 });
 
-ipcMain.handle('find-all', async (event) => {
+ipcMain.handle('find-all', async () => {
   const all = await keytar.findCredentials('nextNotes');
   return all;
 });
