@@ -1,17 +1,22 @@
 <template>
 <div>
   <el-container>
-    <Aside v-bind:categories="categories" v-bind:notes="notes" @newNote="newNote" @option="option" />
+    <Aside v-bind:categories="categories" v-bind:notes="notes" @newNote="newNote" @option="option" @newCategory="newNote" />
     <el-container direction="vertical">
-
       <el-header>
         <el-container class="title" direction="horizontal">
           <p v-if="!editingTitle" v-html="note.title" />
           <el-input class="title-input" v-if="editingTitle" @keyup.enter.native="editTitle" v-bind:value="titleValue" @input="changeTitle"></el-input>
-          <el-tooltip effect="dark" content="Edit title" placement="right" v-if="!editingTitle && note.title">
+          <el-tooltip effect="dark" content="Edit title" placement="top" v-if="!editingTitle && note.title">
             <i class="el-icon-edit" @click="editTitle" />
           </el-tooltip>
           <i class="el-icon-right" @click="editTitle" v-if="editingTitle" />
+          <el-tooltip effect="dark" content="Add to favorites" placement="right" v-if="!note.favorite && note.title">
+            <i class="el-icon-star-off" @click="favoriteNote" />
+          </el-tooltip>
+          <el-tooltip effect="dark" content="Remove from favorites" placement="right" v-if="note.favorite && note.title">
+            <i class="el-icon-star-on" @click="favoriteNote" />
+          </el-tooltip>
         </el-container>
         <el-popover placement="top" width="160" v-model="deletePop">
           <p>Are you sure to delete this?</p>
@@ -38,7 +43,7 @@
 
       <el-row :gutter="20">
         <el-col :md="{span: span}" :sm="{span: 24}" v-if="editorVisibility">
-          <MDEditor v-bind:content="note.content" @textArea="textUpdate" @scrolled="scroll" :key="activeKey" />
+          <MDEditor v-bind:content="note.content" @textArea="textUpdate" @scrolled="scroll" @save="saveToCloud" :key="activeKey" />
         </el-col>
         <el-col :md="{span: span}" :sm="{span: 24}" v-if="viewerVisibility">
           <MDViewer v-bind:content="note.content" v-bind:scrollTo="scrollTo" />
@@ -154,9 +159,11 @@ export default {
     saveToCloud: async function(event, id, body) {
       if (!this.saving && this.activeKey !== -1) {
         this.saving = true;
-        this.callCloud('PUT', id, {
+        body ? this.callCloud('PUT', id, {
           content: body
-        });
+        }) : this.callCloud('PUT', this.activeKey, {
+          content: this.note.content
+        })
       }
     },
 
@@ -166,9 +173,20 @@ export default {
       this.callCloud('DELETE', this.activeKey, {});
       this.$emit('deleteNote', this.activeKey);
       this.activeKey = -1;
+      this.titleValue = "";
+      this.note = {
+        content: "",
+        title: ""
+      };
+      this.categories = [""];
+      this.notes.map(item => {
+        if (item.category != "" && this.categories.indexOf(item.category) < 0) {
+          this.categories.push(item.category);
+        }
+      });
     },
 
-    newNote: async function() {
+    newNote: async function(category) {
       this.saving = true;
       const {
         instance,
@@ -186,7 +204,7 @@ export default {
             title: "New note",
             content: "Type your note...",
             favorite: false,
-            category: ""
+            category: category
           })
         })
         .then(res => {
@@ -201,7 +219,7 @@ export default {
             title: data.title,
             content: data.content,
             favorite: false,
-            category: ""
+            category: category
           }
           this.$emit('add', this.note);
         })
@@ -230,13 +248,11 @@ export default {
           this.notes.map(note => {
             if (note.id === params.id) {
               content = note.content;
+              console.log(note);
             }
           });
           this.saveToCloud(null, params.id, content);
-
         }.bind(this), 10000, params);
-
-        console.log(this.timeouts);
       }
     },
 
@@ -246,6 +262,14 @@ export default {
       this.note = note;
       this.editingTitle = false;
     },
+
+    favoriteNote: function() {
+      this.note.favorite = !this.note.favorite;
+      this.saving = true;
+      this.callCloud('PUT', this.activeKey, {
+        favorite: this.note.favorite
+      });
+    }
   },
 
   computed: {
@@ -268,6 +292,14 @@ export default {
         });
       }
     }
+  },
+
+  mounted() {
+    this.notes.map(item => {
+      if (item.category != "" && this.categories.indexOf(item.category) < 0) {
+        this.categories.push(item.category);
+      }
+    });
   }
 }
 </script>
@@ -328,6 +360,7 @@ export default {
 
 .el-tooltip {
   width: 40px;
+  text-align: center;
 }
 
 .el-icon-upload {

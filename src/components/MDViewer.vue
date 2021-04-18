@@ -26,8 +26,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .el-main {
-  height: 80vh;
+    height: calc(100vh - 70px - 50px);
 }
 </style>
