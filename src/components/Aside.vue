@@ -2,11 +2,11 @@
 <div>
   <el-aside class="aside" width="230px">
     <p class="new-category" @click="dialogVisible=true"><span>New category</span> <span class="plus"> + </span></p>
-    <el-menu :default-openeds="['-1']">
+    <el-menu :default-active="defaultOpen">
       <el-submenu index="-1">
         <template slot="title"> Favorites </template>
         <template v-for="(note, index) in notes">
-          <el-menu-item @click="$emit('option', note)" :index="'favorite' + index" v-if="note.favorite" :key="index" v-html="note.title" />
+          <el-menu-item @click="menuClick(note, index)" :index="'item-' + index" v-if="note.favorite" :key="index" v-html="note.title" />
         </template>
       </el-submenu>
       <el-submenu :index="index.toString()" v-for="(category, index) in categories" :key="index">
@@ -16,7 +16,7 @@
             <div class="add-note" @click="newNote(category)"><span>Create a new note</span> <span class="plus"> + </span></div>
           </template>
           <template v-for="(note, index) in notes">
-            <el-menu-item @click="$emit('option', note)" :index="category + '-' + index" v-if="note.category === category" :key="index" v-html="note.title" />
+            <el-menu-item @click="menuClick(note, index)" :index="'item-' + index" v-if="note.category === category" :key="index" v-html="note.title" />
           </template>
         </el-menu-item-group>
       </el-submenu>
@@ -40,7 +40,9 @@ export default {
   data() {
     return {
       dialogVisible: false,
-      newCategory: ""
+      newCategory: "",
+      defaultOpen: "menu-0",
+      notesSize: 0
     }
   },
 
@@ -51,6 +53,7 @@ export default {
         element[0].classList.remove('is-active');
       }
       this.$emit('newNote', category);
+      this.defaultOpen = "item-0";
     },
 
     closeDialog: function() {
@@ -62,6 +65,35 @@ export default {
       this.dialogVisible = false;
       this.$emit('newCategory', this.newCategory);
       this.newCategory = '';
+    },
+
+    menuClick: function(note, index) {
+      localStorage.defaultOpen = `item-${index}`;
+      localStorage.activeId = note.id;
+      this.$emit('option', note, index);
+      this.defaultOpen = `item-${index}`;
+    }
+  },
+
+  mounted() {
+    if (localStorage.defaultOpen) {
+      this.defaultOpen = localStorage.defaultOpen;
+    }
+  },
+
+  watch: {
+    notes: function() {
+      if (this.noteSize === 0) {
+        this.noteSize = this.notes.length;
+      } else if (this.noteSize < this.notes.length) {
+        this.defaultOpen = "item-0";
+        localStorage.defaultOpen = "0";
+      } else if (this.noteSize > this.notes.length) {
+        this.defaultOpen = "-1";
+        localStorage.defaultOpen = "-1";
+      }
+
+      this.noteSize = this.notes.length;
     }
   }
 }
@@ -73,6 +105,10 @@ export default {
     border-width: 1px;
     border-color: #DCDFE6;
     height: calc(100vh - 70px);
+}
+
+.el-menu:not(.el-menu--collapse) {
+    width: 200px;
 }
 
 ul {

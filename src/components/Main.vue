@@ -187,8 +187,7 @@ export default {
     },
 
     newNote: async function(category) {
-      // TODO
-      // New note will remove content on previously selected note
+
       this.saving = true;
       const {
         instance,
@@ -214,7 +213,6 @@ export default {
         })
         .then(data => {
           this.saving = false;
-
 
           this.activeKey = data.id;
           this.active = data.content
@@ -301,6 +299,11 @@ export default {
 
   mounted() {
     this.notes.map(item => {
+      if (localStorage.activeId && item.id.toString() === localStorage.activeId) {
+        this.active = item.content;
+        this.activeKey = item.id;
+        this.note = item;
+      }
       if (item.category != "" && this.categories.indexOf(item.category) < 0) {
         this.categories.push(item.category);
       }
