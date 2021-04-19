@@ -187,6 +187,8 @@ export default {
     },
 
     newNote: async function(category) {
+      // TODO
+      // New note will remove content on previously selected note
       this.saving = true;
       const {
         instance,
@@ -212,8 +214,11 @@ export default {
         })
         .then(data => {
           this.saving = false;
+
+
           this.activeKey = data.id;
-          this.note.content = data.content;
+          this.active = data.content
+
           this.note = {
             id: data.id,
             title: data.title,
