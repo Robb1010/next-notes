@@ -17,6 +17,8 @@
           <el-tooltip effect="dark" content="Remove from favorites" placement="right" v-if="note.favorite && note.title">
             <i class="el-icon-star-on" @click="favoriteNote" />
           </el-tooltip>
+          <el-alert v-if="error" class="error-alert" title="There seems to be an issue with your connection" type="error" effect="light">
+          </el-alert>
         </el-container>
         <el-popover placement="top" width="160" v-model="deletePop">
           <p>Are you sure to delete this?</p>
@@ -87,7 +89,8 @@ export default {
       titleValue: "",
       deletePop: false,
       timer: false,
-      timeouts: []
+      timeouts: [],
+      error: false
     }
   },
 
@@ -120,6 +123,8 @@ export default {
         password
       } = this.creds;
 
+      this.error = false;
+
       await fetch(`https://${instance}/index.php/apps/notes/api/v1/notes/${id.toString()}`, {
           method: method,
           headers: {
@@ -134,6 +139,7 @@ export default {
         })
         .catch(err => {
           console.log(err);
+          this.error = true;
           this.saving = false;
         });
     },
@@ -195,6 +201,7 @@ export default {
         password
       } = this.creds;
 
+      this.error = false;
       await fetch(`https://${instance}/index.php/apps/notes/api/v1/notes`, {
           method: 'POST',
           headers: {
@@ -228,6 +235,7 @@ export default {
         })
         .catch(err => {
           this.saving = false;
+          this.error = true;
           console.log(err);
         });
     },
@@ -251,7 +259,6 @@ export default {
           this.notes.map(note => {
             if (note.id === params.id) {
               content = note.content;
-              console.log(note);
             }
           });
           this.saveToCloud(null, params.id, content);
@@ -378,6 +385,10 @@ export default {
 .save-to-cloud,
 .el-icon-edit {
   margin-left: 20px;
+}
+
+.error-alert {
+  width: 50%;
 }
 
 .el-tooltip:hover,

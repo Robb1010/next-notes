@@ -5,7 +5,8 @@ import {
   protocol,
   BrowserWindow,
   ipcMain,
-  shell
+  shell,
+  Menu
 } from 'electron'
 import {
   createProtocol
@@ -13,7 +14,8 @@ import {
 import installExtension, {
   VUEJS_DEVTOOLS
 } from 'electron-devtools-installer'
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const path = require('path');
 import keytar from 'keytar';
 
 //const path = require('path');
@@ -27,14 +29,16 @@ protocol.registerSchemesAsPrivileged([{
   }
 }])
 
+const iconPath = path.join(__dirname, "build/icons", "nextnotes.png");
+console.log(iconPath);
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 1100,
     height: 700,
+    icon: iconPath,
     webPreferences: {
       webSecurity: false,
-      //preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
     }
   })
@@ -91,6 +95,28 @@ app.on('ready', async () => {
   createWindow()
 })
 
+// Context menu -- should be in an ipcMain call
+/*
+
+const template = [{
+    label: 'Menu Item 1',
+    click: () => {
+      event.sender.send('context-menu-command', 'menu-item-1')
+    }
+  },
+  {
+    type: 'separator'
+  },
+  {
+    label: 'Menu Item 2',
+    type: 'checkbox',
+    checked: true
+  }
+]
+
+const menu = Menu.buildFromTemplate(template)
+menu.popup();
+*/
 
 ipcMain.handle('delete-account', async (event, account) => {
   const delAccount = await keytar.deletePassword('nextNotes', account);

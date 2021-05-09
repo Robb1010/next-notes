@@ -8,7 +8,10 @@
       <el-form :model="loginForm" :rules="rules" ref="loginForm" v-loading="loading">
         <el-form-item prop="instance">
           <el-input spellcheck="false" v-model="loginForm.instance" placeholder="yourinstance.domain">
-            <template slot="prepend">https://</template>
+            <el-select v-model="http" slot="prepend" placeholder="https://">
+              <el-option label="https://" value="1"></el-option>
+              <el-option label="http://" value="2"></el-option>
+            </el-select>
           </el-input>
         </el-form-item>
         <el-form-item prop="username">
@@ -17,7 +20,7 @@
         <el-form-item prop="password">
           <el-input type="password" v-model="loginForm.password" autocomplete="off" @keyup.enter.native="submitForm('loginForm')"></el-input>
         </el-form-item>
-        <el-alert v-if="error" class="error-alert" title="Invalid credentials" type="error" effect="dark">
+        <el-alert v-if="error" class="error-alert" title="Invalid credentials" type="error" effect="light">
         </el-alert>
         <el-form-item>
           <el-button ref="loginBtn" class="login-btn" type="primary" @click="submitForm('loginForm')">Login</el-button>
@@ -55,6 +58,7 @@ export default {
       loginVis: true,
       loading: false,
       error: false,
+      http: "https://",
       notes: {
         empty: true
       },
@@ -90,7 +94,9 @@ export default {
           this.loading = true;
           this.error = false;
           const form = this.loginForm;
-          await fetch(`https://${form.instance}/index.php/apps/notes/api/v1/notes`, {
+          let http = "https://";
+          this.http === "2" ? http = "http://" : null;
+          await fetch(`${http}${form.instance}/index.php/apps/notes/api/v1/notes`, {
               headers: {
                 Authorization: "Basic " + btoa(form.username + ":" + form.password)
               }
@@ -179,6 +185,10 @@ export default {
   align-items: center;
   height: 100vh;
   width: 100vw;
+}
+
+.el-select {
+  width: 90px;
 }
 
 .error-alert {
