@@ -5,7 +5,7 @@
   <el-container class="is-vertical window" v-if="loginVis">
     <el-container class="is-vertical form-container">
       <h2>nextNotes</h2>
-      <el-form :model="loginForm" :rules="rules" ref="loginForm" v-loading="loading">
+      <el-form :model="loginForm" :rules="rules" ref="loginForm" element-loading-background="rgba(0, 0, 0, 0.7)" v-loading.fullscreen.lock="loading">
         <el-form-item prop="instance">
           <el-input spellcheck="false" v-model="loginForm.instance" placeholder="yourinstance.domain">
             <el-select v-model="http" slot="prepend" placeholder="https://">

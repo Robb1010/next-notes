@@ -5,8 +5,7 @@ import {
   protocol,
   BrowserWindow,
   ipcMain,
-  shell,
-  Menu
+  shell
 } from 'electron'
 import {
   createProtocol
@@ -60,8 +59,8 @@ async function createWindow() {
       shell.openExternal(url)
     }
   })
-
 }
+
 
 
 
@@ -117,6 +116,9 @@ const template = [{
 const menu = Menu.buildFromTemplate(template)
 menu.popup();
 */
+
+// Detect System Theme 
+//console.log(nativeTheme.shouldUseDarkColors);
 
 ipcMain.handle('delete-account', async (event, account) => {
   const delAccount = await keytar.deletePassword('nextNotes', account);
