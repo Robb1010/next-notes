@@ -8,9 +8,6 @@
 import Login from './components/Login.vue'
 import Main from './components/Main.vue'
 
-// Dark theme needs more work
-//import 'element-theme-dark';
-
 const routes = {
   '/': Login,
   '/app': Main

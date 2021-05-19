@@ -5,7 +5,8 @@ import {
   protocol,
   BrowserWindow,
   ipcMain,
-  shell
+  shell,
+  nativeTheme
 } from 'electron'
 import {
   createProtocol
@@ -14,10 +15,9 @@ import installExtension, {
   VUEJS_DEVTOOLS
 } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const os = require('os');
 const path = require('path');
 import keytar from 'keytar';
-
-//const path = require('path');
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{
@@ -29,18 +29,21 @@ protocol.registerSchemesAsPrivileged([{
 }])
 
 const iconPath = path.join(__dirname, "build/icons", "nextnotes.png");
-console.log(iconPath);
+
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 1100,
     height: 700,
-    icon: iconPath,
+    minWidth: 1000,
+    minHeight: 500,
     webPreferences: {
       webSecurity: false,
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
     }
   })
+
+  os.platform() === 'linux' ? win.setIcon(iconPath): null;
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -60,9 +63,6 @@ async function createWindow() {
     }
   })
 }
-
-
-
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -133,6 +133,10 @@ ipcMain.handle('find-all', async () => {
 
 ipcMain.on('set-password', async (event, user, pass) => {
   await keytar.setPassword('nextNotes', user, pass)
+});
+
+ipcMain.handle('handle-theme', async() => {
+  return nativeTheme.shouldUseDarkColors;
 });
 
 

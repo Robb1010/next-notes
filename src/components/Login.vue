@@ -50,8 +50,8 @@ export default {
   data() {
     return {
       loginForm: {
-        instance: 'nextcloud.robertsoldan.com',
-        username: 'robert',
+        instance: '',
+        username: '',
         password: '',
         keep: false,
       },

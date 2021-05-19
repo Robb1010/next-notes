@@ -18,6 +18,7 @@
   "dependencies": {
     "@adapttive/vue-markdown": "^4.0.1",
     "core-js": "~3.10.0",
+    "element-theme-chalk": "^2.15.1",
     "element-ui": "~2.15.1",
     "highlight.js": "^10.7.2",
     "keytar": "^7.6.0",
