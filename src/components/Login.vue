@@ -1,58 +1,95 @@
 /* eslint-disable no-useless-escape */
 <template>
-<div>
-  <Header v-if="!loginVis" @logOut="logOut" />
-  <el-container class="is-vertical window" v-if="loginVis">
-    <el-container class="is-vertical form-container">
-      <h2>nextNotes</h2>
-      <el-form :model="loginForm" :rules="rules" ref="loginForm" element-loading-background="rgba(0, 0, 0, 0.7)" v-loading.fullscreen.lock="loading">
-        <el-form-item prop="instance">
-          <el-input spellcheck="false" v-model="loginForm.instance" placeholder="yourinstance.domain">
-            <el-select v-model="http" slot="prepend" placeholder="https://">
-              <el-option label="https://" value="1"></el-option>
-              <el-option label="http://" value="2"></el-option>
-            </el-select>
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="username">
-          <el-input spellcheck="false" v-model="loginForm.username" placeholder="username"> </el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input type="password" v-model="loginForm.password" autocomplete="off" @keyup.enter.native="submitForm('loginForm')"></el-input>
-        </el-form-item>
-        <el-alert v-if="error" class="error-alert" title="Invalid credentials" type="error" effect="light">
-        </el-alert>
-        <el-form-item>
-          <el-button ref="loginBtn" class="login-btn" type="primary" @click="submitForm('loginForm')">Login</el-button>
-          <el-checkbox v-model="loginForm.keep">Keep me signed in</el-checkbox>
-        </el-form-item>
-      </el-form>
+  <div>
+    <Header v-if="!loginVis" @logOut="logOut" />
+    <el-container class="is-vertical window" v-if="loginVis">
+      <el-container class="is-vertical form-container">
+        <h2>nextNotes</h2>
+        <el-form
+          :model="loginForm"
+          :rules="rules"
+          ref="loginForm"
+          element-loading-background="rgba(0, 0, 0, 0.7)"
+          v-loading.fullscreen.lock="loading"
+        >
+          <el-form-item prop="instance">
+            <el-input
+              spellcheck="false"
+              v-model="loginForm.instance"
+              placeholder="yourinstance.domain"
+            >
+              <el-select v-model="http" slot="prepend" placeholder="https://">
+                <el-option label="https://" value="1"></el-option>
+                <el-option label="http://" value="2"></el-option>
+              </el-select>
+            </el-input>
+          </el-form-item>
+          <el-form-item prop="username">
+            <el-input
+              spellcheck="false"
+              v-model="loginForm.username"
+              placeholder="username"
+            >
+            </el-input>
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input
+              type="password"
+              v-model="loginForm.password"
+              autocomplete="off"
+              @keyup.enter.native="submitForm('loginForm')"
+            ></el-input>
+          </el-form-item>
+          <el-alert
+            v-if="error"
+            class="error-alert"
+            title="Invalid credentials"
+            type="error"
+            effect="light"
+          >
+          </el-alert>
+          <el-form-item>
+            <el-button
+              ref="loginBtn"
+              class="login-btn"
+              type="primary"
+              @click="submitForm('loginForm')"
+              >Login</el-button
+            >
+            <el-checkbox v-model="loginForm.keep"
+              >Keep me signed in</el-checkbox
+            >
+          </el-form-item>
+        </el-form>
+      </el-container>
     </el-container>
-  </el-container>
-  <Main v-bind:notes="notes" v-bind:creds="loginForm" v-if="!loginVis" @add="addNote" @deleteNote="deleteNote" />
-</div>
+    <Main
+      v-bind:notes="notes"
+      v-bind:creds="loginForm"
+      v-if="!loginVis"
+      @add="addNote"
+      @deleteNote="deleteNote"
+    />
+  </div>
 </template>
 
 <script>
 import Main from "./Main.vue";
 import Header from "./Header.vue";
-import {
-  ipcRenderer
-} from "electron";
-
+import { ipcRenderer } from "electron";
 
 export default {
-  name: 'Login',
+  name: "Login",
   components: {
     Main,
-    Header
+    Header,
   },
   data() {
     return {
       loginForm: {
-        instance: '',
-        username: '',
-        password: '',
+        instance: "",
+        username: "",
+        password: "",
         keep: false,
       },
       loginVis: true,
@@ -60,48 +97,57 @@ export default {
       error: false,
       http: "https://",
       notes: {
-        empty: true
+        empty: true,
       },
       rules: {
-        instance: [{
+        instance: [
+          {
             required: true,
-            message: 'Please provide an instance link',
-            trigger: 'blur'
+            message: "Please provide an instance link",
+            trigger: "blur",
           },
           {
             min: 3,
-            message: 'Please provide a valid link',
-            trigger: 'blur'
-          }
+            message: "Please provide a valid link",
+            trigger: "blur",
+          },
         ],
-        username: [{
-          required: true,
-          message: 'Please fill in your username',
-          trigger: 'blur'
-        }],
-        password: [{
-          required: true,
-          message: 'Please fill in your password',
-          trigger: 'blur'
-        }]
+        username: [
+          {
+            required: true,
+            message: "Please fill in your username",
+            trigger: "blur",
+          },
+        ],
+        password: [
+          {
+            required: true,
+            message: "Please fill in your password",
+            trigger: "blur",
+          },
+        ],
       },
-    }
+    };
   },
   methods: {
-    submitForm: function(loginForm) {
+    submitForm: function (loginForm) {
       this.$refs[loginForm].validate(async (valid) => {
         if (valid) {
           this.loading = true;
           this.error = false;
           const form = this.loginForm;
           let http = "https://";
-          this.http === "2" ? http = "http://" : null;
-          await fetch(`${http}${form.instance}/index.php/apps/notes/api/v1/notes`, {
+          this.http === "2" ? (http = "http://") : null;
+          await fetch(
+            `${http}${form.instance}/index.php/apps/notes/api/v1/notes`,
+            {
               headers: {
-                Authorization: "Basic " + btoa(form.username + ":" + form.password)
-              }
-            })
-            .then(res => {
+                Authorization:
+                  "Basic " + btoa(form.username + ":" + form.password),
+              },
+            }
+          )
+            .then((res) => {
               if (res.status === 200) {
                 return res.json();
               } else {
@@ -109,7 +155,7 @@ export default {
                 return res.json();
               }
             })
-            .then(async res => {
+            .then(async (res) => {
               if (this.error) {
                 this.loading = false;
               } else {
@@ -118,48 +164,54 @@ export default {
                 this.loginVis = false;
                 this.loading = false;
                 if (form.keep) {
-                  await ipcRenderer.send('set-password', `${form.username}|${form.instance}`, form.password);
+                  await ipcRenderer.send(
+                    "set-password",
+                    `${form.username}|${form.instance}`,
+                    form.password
+                  );
                 }
               }
             })
-            .catch(err => {
+            .catch((err) => {
               this.loading = false;
               this.error = true;
-              console.log(err)
+              console.log(err);
             });
         } else {
           this.error = true;
           return false;
         }
-      })
+      });
     },
 
-    logOut: function() {
+    logOut: function () {
       const username = `${this.loginForm.username}|${this.loginForm.instance}`;
       console.log("username");
-      ipcRenderer.invoke('delete-account', username)
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
+      ipcRenderer
+        .invoke("delete-account", username)
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
       this.loginVis = true;
     },
 
-    addNote: function(note) {
+    addNote: function (note) {
       this.notes.unshift(note);
     },
 
-    deleteNote: function(noteKey) {
+    deleteNote: function (noteKey) {
       this.notes.map((note, index) => {
         if (note.id === noteKey) {
           this.notes.splice(index, 1);
         }
-      })
-    }
+      });
+    },
   },
 
-  mounted: function() {
-    ipcRenderer.invoke('find-all')
-      .then(res => {
-        const instPass = res[0].account.split('|');
+  mounted: function () {
+    ipcRenderer
+      .invoke("find-all")
+      .then((res) => {
+        const instPass = res[0].account.split("|");
         const instance = instPass[1];
         const username = instPass[0];
         const passwd = res[0].password;
@@ -167,16 +219,15 @@ export default {
           instance: instance,
           username: username,
           password: passwd,
-          keep: false
+          keep: true,
         };
         setTimeout(() => this.$refs.loginBtn.$listeners.click(), 100);
-
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
-  }
-}
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

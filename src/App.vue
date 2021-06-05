@@ -38,7 +38,6 @@ export default {
 <style>
 body {
   margin: 0 !important;
-  color: #DCDFE6;
 }
 
 table,

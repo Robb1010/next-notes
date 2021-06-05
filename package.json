@@ -24,6 +24,7 @@
     "keytar": "^7.6.0",
     "markdown": "^0.5.0",
     "marked": "^2.0.1",
+    "prettier": "^2.3.0",
     "vue": "~2.6.12",
     "vue-scroll-sync": "^1.0.5"
   },

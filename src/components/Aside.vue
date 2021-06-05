@@ -1,78 +1,108 @@
 <template>
-<div>
-  <el-aside class="aside" width="230px">
-    <p class="new-category" @click="dialogVisible=true"><span>New category</span> <span class="plus"> + </span></p>
-    <el-menu :default-active="defaultOpen">
-      <el-submenu index="-1">
-        <template slot="title"> Favorites </template>
-        <template v-for="(note, index) in notes">
-          <el-menu-item @click="menuClick(note, index)" :index="'item-' + index" v-if="note.favorite" :key="index" v-html="note.title" />
-        </template>
-      </el-submenu>
-      <el-submenu :index="index.toString()" v-for="(category, index) in categories" :key="index">
-        <template slot="title"> {{category === '' ? "Unassigned" : category}}</template>
-        <el-menu-item-group>
-          <template slot="title">
-            <div class="add-note" @click="newNote(category)"><span>Create a new note</span> <span class="plus"> + </span></div>
-          </template>
+  <div>
+    <el-aside class="aside" width="230px">
+      <p class="new-category" @click="dialogVisible = true">
+        <span>New category</span> <span class="plus"> + </span>
+      </p>
+      <el-menu :default-active="defaultOpen">
+        <el-submenu index="-1">
+          <template slot="title"> Favorites </template>
           <template v-for="(note, index) in notes">
-            <el-menu-item @click="menuClick(note, index)" :index="'item-' + index" v-if="note.category === category" :key="index" v-html="note.title" />
+            <el-menu-item
+              @click="menuClick(note, index)"
+              :index="'item-' + index"
+              v-if="note.favorite"
+              :key="index"
+              v-html="note.title"
+            />
           </template>
-        </el-menu-item-group>
-      </el-submenu>
-    </el-menu>
-  </el-aside>
-  <el-dialog title="Add new category" :visible.sync="dialogVisible" width="30%">
-    <el-input placeholder="Category name" v-model="newCategory" @keyup.enter.native="addCategory" />
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="closeDialog">Cancel</el-button>
-      <el-button type="primary" @click="addCategory">Confirm</el-button>
-    </span>
-  </el-dialog>
-</div>
+        </el-submenu>
+        <el-submenu
+          :index="index.toString()"
+          v-for="(category, index) in categories"
+          :key="index"
+        >
+          <template slot="title">
+            {{ category === "" ? "Unassigned" : category }}</template
+          >
+          <el-menu-item-group>
+            <template slot="title">
+              <div class="add-note" @click="newNote(category)">
+                <span>Create a new note</span> <span class="plus"> + </span>
+              </div>
+            </template>
+            <template v-for="(note, index) in notes">
+              <el-menu-item
+                @click="menuClick(note, index)"
+                :index="'item-' + index"
+                v-if="note.category === category"
+                :key="index"
+                v-html="note.title"
+              />
+            </template>
+          </el-menu-item-group>
+        </el-submenu>
+      </el-menu>
+    </el-aside>
+    <el-dialog
+      title="Add new category"
+      :visible.sync="dialogVisible"
+      width="30%"
+    >
+      <el-input
+        placeholder="Category name"
+        v-model="newCategory"
+        @keyup.enter.native="addCategory"
+      />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog">Cancel</el-button>
+        <el-button type="primary" @click="addCategory">Confirm</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'Aside',
-  props: ['categories', 'notes'],
+  name: "Aside",
+  props: ["categories", "notes"],
 
   data() {
     return {
       dialogVisible: false,
       newCategory: "",
       defaultOpen: "menu-0",
-      notesSize: 0
-    }
+      notesSize: 0,
+    };
   },
 
   methods: {
-    newNote: function(category) {
-      const element = document.getElementsByClassName('is-active el-menu-item')
+    newNote: function (category) {
+      const element = document.getElementsByClassName("is-active el-menu-item");
       if (element[0]) {
-        element[0].classList.remove('is-active');
+        element[0].classList.remove("is-active");
       }
-      this.$emit('newNote', category);
+      this.$emit("newNote", category);
       this.defaultOpen = "item-0";
     },
 
-    closeDialog: function() {
+    closeDialog: function () {
       this.dialogVisible = false;
-      this.newCategory = '';
+      this.newCategory = "";
     },
 
-    addCategory: function() {
+    addCategory: function () {
       this.dialogVisible = false;
-      this.$emit('newCategory', this.newCategory);
-      this.newCategory = '';
+      this.$emit("newCategory", this.newCategory);
+      this.newCategory = "";
     },
 
-    menuClick: function(note, index) {
+    menuClick: function (note, index) {
       localStorage.defaultOpen = `item-${index}`;
       localStorage.activeId = note.id;
-      this.$emit('option', note, index);
+      this.$emit("option", note, index);
       this.defaultOpen = `item-${index}`;
-    }
+    },
   },
 
   mounted() {
@@ -82,7 +112,7 @@ export default {
   },
 
   watch: {
-    notes: function() {
+    notes: function () {
       if (this.noteSize === 0) {
         this.noteSize = this.notes.length;
       } else if (this.noteSize < this.notes.length) {
@@ -94,46 +124,46 @@ export default {
       }
 
       this.noteSize = this.notes.length;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped lang="scss">
 .aside {
-    border-right-style: solid;
-    border-width: 1px;
-    border-color: #DCDFE6;
-    height: calc(100vh - 70px);
+  border-right-style: solid;
+  border-width: 1px;
+  border-color: #dcdfe6;
+  height: calc(100vh - 70px);
 }
 
 .el-menu:not(.el-menu--collapse) {
-    width: 200px;
+  width: 200px;
 }
 
 ul {
-    border-right: none;
+  border-right: none;
 }
 
 .new-category {
-    font-size: 0.9rem;
-    padding-left: 20px;
-    color: #909399;
+  font-size: 0.9rem;
+  padding-left: 20px;
+  color: #909399;
 }
 
 .plus {
-    font-size: 1.2rem;
-    margin-left: 10px;
+  font-size: 1.2rem;
+  margin-left: 10px;
 }
 
 .add-note {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .add-note:hover,
 .new-category:hover {
-    cursor: pointer;
-    color: #409EFF;
+  cursor: pointer;
+  color: #409eff;
 }
 </style>
