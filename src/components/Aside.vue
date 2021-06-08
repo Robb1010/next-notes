@@ -1,11 +1,11 @@
 <template>
   <div>
     <el-aside class="aside" width="230px">
-      <p class="new-category" @click="dialogVisible = true">
+      <p class="new-category unselectable" @click="dialogVisible = true">
         <span>New category</span> <span class="plus"> + </span>
       </p>
       <el-menu :default-active="defaultOpen">
-        <el-submenu index="-1">
+        <el-submenu index="-1" class="unselectable">
           <template slot="title"> Favorites </template>
           <template v-for="(note, index) in notes">
             <el-menu-item
@@ -14,6 +14,7 @@
               v-if="note.favorite"
               :key="index"
               v-html="note.title"
+              class="unselectable"
             />
           </template>
         </el-submenu>
@@ -21,14 +22,15 @@
           :index="index.toString()"
           v-for="(category, index) in categories"
           :key="index"
+          class="unselectable"
         >
-          <template slot="title">
+          <template slot="title" class="unselectable">
             {{ category === "" ? "Unassigned" : category }}</template
           >
           <el-menu-item-group>
             <template slot="title">
               <div class="add-note" @click="newNote(category)">
-                <span>Create a new note</span> <span class="plus"> + </span>
+                <span class="unselectable">Create a new note</span> <span class="plus unselectable"> + </span>
               </div>
             </template>
             <template v-for="(note, index) in notes">
@@ -38,6 +40,7 @@
                 v-if="note.category === category"
                 :key="index"
                 v-html="note.title"
+                class="unselectable"
               />
             </template>
           </el-menu-item-group>
@@ -48,6 +51,7 @@
       title="Add new category"
       :visible.sync="dialogVisible"
       width="30%"
+      class="unselectable"
     >
       <el-input
         placeholder="Category name"

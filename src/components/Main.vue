@@ -25,21 +25,23 @@
               placement="top"
               v-if="!editingTitle && note.title"
             >
-              <i class="el-icon-edit" @click="editTitle" />
+              <i class="el-icon-edit unselectable" @click="editTitle" />
             </el-tooltip>
-            <i class="el-icon-right" @click="editTitle" v-if="editingTitle" />
+            <i class="el-icon-right unselectable" @click="editTitle" v-if="editingTitle" />
             <el-tooltip
+              class="unselectable"
               effect="dark"
               content="Add to favorites"
               placement="right"
               v-if="!note.favorite && note.title"
             >
-              <i class="el-icon-star-off" @click="favoriteNote" />
+              <i class="el-icon-star-off unselectable" @click="favoriteNote" />
             </el-tooltip>
             <el-tooltip
               effect="dark"
               content="Remove from favorites"
               placement="right"
+              class="unselectable"
               v-if="note.favorite && note.title"
             >
               <i class="el-icon-star-on" @click="favoriteNote" />

@@ -35,9 +35,20 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+$--font-path: '~element-ui/lib/theme-chalk/fonts';
+@import "~element-ui/packages/theme-chalk/src/index";
+
 body {
   margin: 0 !important;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 table,
@@ -72,11 +83,6 @@ th {
 ::-webkit-scrollbar-thumb {
   -webkit-border-radius: 10px;
   border-radius: 10px;
-  background: #DCDFE6;
-
 }
 
-::-webkit-scrollbar-thumb:window-inactive {
-  background: #DCDFE6;
-}
 </style>
