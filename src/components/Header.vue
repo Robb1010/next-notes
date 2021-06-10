@@ -11,8 +11,16 @@
             class="theme-switch"
             @change="changeTheme"
           />
+          <el-select v-model="locale">
+            <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
           <el-button type="primary" class="logout-btn" @click="$emit('logOut')">
-            Logout
+            {{ $t("actions.logout") }}
           </el-button>
         </div>
       </el-container>
@@ -23,11 +31,15 @@
 <script>
 //import { ipcRenderer } from "electron";
 
+import i18n from "@/i18n";
+
 export default {
   name: "Header",
   data() {
     return {
       theme: true,
+      options: [],
+      locale: 'en'
     };
   },
 
@@ -46,11 +58,28 @@ export default {
         import("element-theme-chalk");
       }
     },
+    locale: async function () {
+      i18n.locale = this.locale;
+      await window.localStorage.setItem("locale", this.locale);
+    }
   },
 
   mounted: async function () {
-    if (window.localStorage.getItem("theme")) {
-      this.theme = window.localStorage.getItem("theme") === "true";
+    const locales = i18n.availableLocales;
+    let options = [];
+    locales.map((item) => {
+      options.push({
+        value: item,
+        label: item
+      });
+    });
+    this.options = options;
+
+    if(await localStorage.getItem("locale")) {
+      this.locale = await localStorage.getItem("locale");
+    } else this.locale = options[0].value;
+    if (await window.localStorage.getItem("theme")) {
+      this.theme = await window.localStorage.getItem("theme") === "true";
     }
   },
 };
@@ -78,4 +107,10 @@ export default {
 .logout-btn {
   height: 40px;
 }
+
+.el-select {
+  width: 70px;
+  margin-right: 20px;
+}
+
 </style>

@@ -2,11 +2,11 @@
   <div>
     <el-aside class="aside" width="230px">
       <p class="new-category unselectable" @click="dialogVisible = true">
-        <span>New category</span> <span class="plus"> + </span>
+        <span>{{ $t("aside.new_category") }}</span> <span class="plus"> + </span>
       </p>
       <el-menu :default-active="defaultOpen">
         <el-submenu index="-1" class="unselectable">
-          <template slot="title"> Favorites </template>
+          <template slot="title"> {{ $t("aside.favorites") }} </template>
           <template v-for="(note, index) in notes">
             <el-menu-item
               @click="menuClick(note, index)"
@@ -25,12 +25,12 @@
           class="unselectable"
         >
           <template slot="title" class="unselectable">
-            {{ category === "" ? "Unassigned" : category }}</template
+            {{ category === "" ? $t("aside.unassigned") : category }}</template
           >
           <el-menu-item-group>
             <template slot="title">
               <div class="add-note" @click="newNote(category)">
-                <span class="unselectable">Create a new note</span> <span class="plus unselectable"> + </span>
+                <span class="unselectable">{{ $t("aside.new_note") }}</span> <span class="plus unselectable"> + </span>
               </div>
             </template>
             <template v-for="(note, index) in notes">
@@ -48,19 +48,19 @@
       </el-menu>
     </el-aside>
     <el-dialog
-      title="Add new category"
+      :title="$t('aside.add_category')"
       :visible.sync="dialogVisible"
       width="30%"
       class="unselectable"
     >
       <el-input
-        placeholder="Category name"
+        :placeholder="$t('aside.category_name')"
         v-model="newCategory"
         @keyup.enter.native="addCategory"
       />
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">Cancel</el-button>
-        <el-button type="primary" @click="addCategory">Confirm</el-button>
+        <el-button @click="closeDialog">{{ $t("actions.cancel") }}</el-button>
+        <el-button type="primary" @click="addCategory">{{ $t("actions.confirm") }}</el-button>
       </span>
     </el-dialog>
   </div>

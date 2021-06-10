@@ -2,7 +2,7 @@
   <div>
     <el-input
       type="textarea"
-      placeholder="Please input"
+      :placeholder="$t('editor.input')"
       v-model="editable"
       @input="$emit('textArea', $event)"
       @keydown.ctrl.83="testCtrl"

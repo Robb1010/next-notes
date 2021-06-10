@@ -1,0 +1,40 @@
+{
+  "login_page": {
+    "login": "Autentificare",
+    "username": "utilizator",
+    "keep_signed_in": "Păstrează-mă autentificat(ă)"
+  },
+  "aside": {
+    "new_category": "Categorie nouă",
+    "favorites": "Favorite",
+    "unassigned": "Fără categorie",
+    "new_note": "Creează o nouă notă",
+    "add_category": "Adaugă o nouă categorie",
+    "category_name": "Nume categorie"
+  },
+  "main": {
+    "edit_title": "Editează titlu",
+    "add_favorite": "Adaugă la favorite",
+    "remove_favorite": "Șterge de la favorite",
+    "connection_error": "Probleme cu conexiunea la server",
+    "delete_confirmation": "Ești sigur(ă) că vrei să ștergi?",
+    "views": "Schimbă modul de vizualizare",
+    "save": "Salvează"
+  },
+  "editor": {
+    "input": "Scrie..."
+  },
+  "actions": {
+    "cancel": "Anulează",
+    "confirm": "Confirmă",
+    "yes": "Da",
+    "no": "Nu",
+    "logout": "Ieșire"
+  },
+  "errors": {
+    "invalid_credentials": "Detalii autentificare invalide",
+    "instance_link": "Scrieți un link pentru instanța Nextcloud",
+    "fill_username": "Scrieți un nume utilizator",
+    "fill_password": "Scrieți parola"
+  }
+}

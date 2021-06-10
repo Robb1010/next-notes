@@ -7,6 +7,7 @@
 <script>
 import Login from './components/Login.vue'
 import Main from './components/Main.vue'
+import i18n from "@/i18n";
 
 const routes = {
   '/': Login,
@@ -29,6 +30,11 @@ export default {
       return routes[this.currentRoute] || Login
     }
   },
+
+  mounted: function () {
+    localStorage.getItem("locale") ? i18n.locale = localStorage.getItem("locale") : null;
+  },
+
   render() {
     return this.ViewComponent
   }

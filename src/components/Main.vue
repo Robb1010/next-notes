@@ -21,7 +21,7 @@
             ></el-input>
             <el-tooltip
               effect="dark"
-              content="Edit title"
+              :content="$t('main.edit_title')"
               placement="top"
               v-if="!editingTitle && note.title"
             >
@@ -31,7 +31,7 @@
             <el-tooltip
               class="unselectable"
               effect="dark"
-              content="Add to favorites"
+              :content="$t('main.add_favorite')"
               placement="right"
               v-if="!note.favorite && note.title"
             >
@@ -39,7 +39,7 @@
             </el-tooltip>
             <el-tooltip
               effect="dark"
-              content="Remove from favorites"
+              :content="$t('main.remove_favorite')"
               placement="right"
               class="unselectable"
               v-if="note.favorite && note.title"
@@ -49,27 +49,27 @@
             <el-alert
               v-if="error"
               class="error-alert"
-              title="There seems to be an issue with your connection"
+              :title="$t('main.connection_error')"
               type="error"
               effect="light"
             >
             </el-alert>
           </el-container>
           <el-popover placement="top" width="160" v-model="deletePop">
-            <p>Are you sure to delete this?</p>
+            <p>{{ $t("main.delete_confirmation") }}</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="deletePop = false"
-                >No</el-button
+                >{{ $t("actions.no") }}</el-button
               >
               <el-button type="danger" size="mini" @click="deleteItem"
-                >Yes</el-button
+                >{{ $t("actions.yes") }}</el-button
               >
             </div>
             <i slot="reference" class="el-icon-delete" />
           </el-popover>
           <el-tooltip
             effect="dark"
-            content="Cycle through views"
+            :content="$t('main.views')"
             placement="top-start"
           >
             <div class="switcher" @click="cycleView">
@@ -81,7 +81,7 @@
           <el-tooltip
             effect="dark"
             class="save-to-cloud"
-            content="Save to cloud"
+            :content="$t('main.save')"
             placement="top-start"
           >
             <div @click="saveToCloud">

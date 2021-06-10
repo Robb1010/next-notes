@@ -1,0 +1,40 @@
+{
+  "login_page": {
+    "login": "Login",
+    "username": "username",
+    "keep_signed_in": "Keep me signed in"
+  },
+  "aside": {
+    "new_category": "New category",
+    "favorites": "Favorites",
+    "unassigned": "Unassigned",
+    "new_note": "Create a new note",
+    "add_category": "Add new category",
+    "category_name": "Category name"
+  },
+  "main": {
+    "edit_title": "Edit title",
+    "add_favorite": "Add to favorites",
+    "remove_favorite": "Remove from favorites",
+    "connection_error": "There seems to be an issue with your connection",
+    "delete_confirmation": "Are you sure to delete this?",
+    "views": "Cycle through views",
+    "save": "Save to cloud"
+  },
+  "editor": {
+    "input": "Please input"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "logout": "Logout"
+  },
+  "errors": {
+    "invalid_credentials": "Invalid credentials",
+    "instance_link": "Please provide an instance link",
+    "fill_username": "Please fill in your username",
+    "fill_password": "Please fill in your password"
+  }
+}

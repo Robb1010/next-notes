@@ -28,7 +28,7 @@
             <el-input
               spellcheck="false"
               v-model="loginForm.username"
-              placeholder="username"
+              :placeholder="$t('login_page.username')"
             >
             </el-input>
           </el-form-item>
@@ -43,7 +43,7 @@
           <el-alert
             v-if="error"
             class="error-alert"
-            title="Invalid credentials"
+            :title="$t('errors.invalid_credentials')"
             type="error"
             effect="light"
           >
@@ -54,10 +54,10 @@
               class="login-btn"
               type="primary"
               @click="submitForm('loginForm')"
-              >Login</el-button
+              >{{ $t("login_page.login") }}</el-button
             >
             <el-checkbox v-model="loginForm.keep"
-              >Keep me signed in</el-checkbox
+              >{{ $t("login_page.keep_signed_in") }}</el-checkbox
             >
           </el-form-item>
         </el-form>
@@ -103,26 +103,26 @@ export default {
         instance: [
           {
             required: true,
-            message: "Please provide an instance link",
+            message: this.$t("errors.invalid_credentials"),
             trigger: "blur",
           },
           {
             min: 3,
-            message: "Please provide a valid link",
+            message: this.$t("errors.instance_link"),
             trigger: "blur",
           },
         ],
         username: [
           {
             required: true,
-            message: "Please fill in your username",
+            message: this.$t("errors.fill_username"),
             trigger: "blur",
           },
         ],
         password: [
           {
             required: true,
-            message: "Please fill in your password",
+            message: this.$t("errors.fill_password"),
             trigger: "blur",
           },
         ],

@@ -1,20 +1,26 @@
 module.exports = {
   pluginOptions: {
     electronBuilder: {
-      // List native deps here if they don't work
-      externals: ['keytar'],
-      //preload: 'src/preload.js',
+      externals: [
+        'keytar'
+      ],
       nodeIntegration: true,
       builderOptions: {
-        appId: "com.electron.nextnotes",
-        productName: "Next Notes",
+        appId: 'com.electron.nextnotes',
+        productName: 'Next Notes',
         mac: {
-          icon: "public/build/icon.icns"
+          icon: 'public/build/icon.icns'
         },
         win: {
-          icon: "public/build/icon.ico"
+          icon: 'public/build/icon.ico'
         }
       }
+    },
+    i18n: {
+      locale: 'en',
+      fallbackLocale: 'en',
+      localeDir: 'locales',
+      enableInSFC: false
     }
   }
 }
