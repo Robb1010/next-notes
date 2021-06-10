@@ -1,20 +1,13 @@
 "use strict";
 
-import {
-  app,
-  protocol,
-  BrowserWindow,
-  ipcMain,
-  shell,
-  nativeTheme,
-} from "electron";
-import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
+import {app, BrowserWindow, ipcMain, nativeTheme, protocol, shell, Menu} from "electron";
+import {createProtocol} from "vue-cli-plugin-electron-builder/lib";
+import installExtension, {VUEJS_DEVTOOLS} from "electron-devtools-installer";
+import keytar from "keytar";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const os = require("os");
 const path = require("path");
-import keytar from "keytar";
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -42,6 +35,8 @@ async function createWindow() {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
     },
   });
+
+  Menu.setApplicationMenu(null);
 
   os.platform() === "linux" ? win.setIcon(iconPath) : null;
 
@@ -121,13 +116,11 @@ menu.popup();
 //console.log(nativeTheme.shouldUseDarkColors);
 
 ipcMain.handle("delete-account", async (event, account) => {
-  const delAccount = await keytar.deletePassword("nextNotes", account);
-  return delAccount;
+  return await keytar.deletePassword("nextNotes", account);
 });
 
 ipcMain.handle("find-all", async () => {
-  const all = await keytar.findCredentials("nextNotes");
-  return all;
+  return await keytar.findCredentials("nextNotes");
 });
 
 ipcMain.on("set-password", async (event, user, pass) => {
