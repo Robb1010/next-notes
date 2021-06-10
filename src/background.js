@@ -27,7 +27,7 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-const iconPath = path.join(__dirname, "build/icons", "nextnotes.png");
+const iconPath = path.join(__dirname, "build/icons", "icon.png");
 
 async function createWindow() {
   // Create the browser window.
