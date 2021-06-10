@@ -38,6 +38,7 @@ async function createWindow() {
     minHeight: 500,
     webPreferences: {
       webSecurity: false,
+      spellcheck: false,
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
     },
   });
