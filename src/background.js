@@ -36,7 +36,8 @@ async function createWindow() {
     },
   });
 
-  Menu.setApplicationMenu(null);
+  //Hide the menu
+  //Menu.setApplicationMenu(null);
 
   os.platform() === "linux" ? win.setIcon(iconPath) : null;
 

@@ -134,6 +134,27 @@ export default {
 </script>
 
 <style scoped lang="scss">
+::-webkit-scrollbar {
+  width: 4px;
+  -webkit-border-radius: 4px;
+}
+
+::-webkit-scrollbar:hover {
+  width: 8px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  width: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  background-color: #dcdfe6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  width: 8px;
+}
+
 .aside {
   border-right-style: solid;
   border-width: 1px;

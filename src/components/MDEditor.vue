@@ -56,15 +56,32 @@ export default {
 ::v-deep textarea {
   width: 100% !important;
   height: calc(100vh - 70px - 50px);
-  border: none;
-  border-right: solid;
   border-radius: 0;
-  border-color: #dcdfe6;
-  border-width: 1px;
+  border: 1px none #dcdfe6;
+  border-right-style: solid;
   resize: none;
 }
 
-::v-deep textarea:hover {
-  border-color: #dcdfe6;
+.el-textarea {
+  ::-webkit-scrollbar {
+    width: 4px;
+    -webkit-border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar:hover {
+    width: 8px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    width: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background-color: #dcdfe6;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    width: 8px;
+  }
 }
 </style>
