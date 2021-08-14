@@ -1,24 +1,26 @@
 # next-notes
 
+### This is a very early build, do not trust it without backing up your data!
+
+This is an unfinished project, currently on hold.
+
+The codebase is in dire need of a refactor.
+
 ## Project setup
+
 ```
 npm install
 ```
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run start
 ```
 
-### Compiles and minifies for production
+### Build
 ```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
+npm run electron:build
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+If your are not on Linux and the app ins't running, in `background.js`, check the `iconPath`, I didn't test how well that works on Windows or Mac.
+
