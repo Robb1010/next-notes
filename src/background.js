@@ -4,6 +4,7 @@ import {app, BrowserWindow, ipcMain, nativeTheme, protocol, shell, Menu} from "e
 import {createProtocol} from "vue-cli-plugin-electron-builder/lib";
 import installExtension, {VUEJS_DEVTOOLS} from "electron-devtools-installer";
 import keytar from "keytar";
+import isDev from "electron-is-dev";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const os = require("os");
@@ -20,7 +21,9 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-const iconPath = path.join(__dirname, "build/icons", "icon.png");
+let iconPath;
+
+isDev ? iconPath = path.join(__dirname, "../src/assets", "nextnotes.png") : iconPath = path.join(__dirname, "build/icons", "icon.png");
 
 async function createWindow() {
   // Create the browser window.
