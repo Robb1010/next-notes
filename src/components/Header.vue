@@ -1,116 +1,97 @@
 <template>
-  <div>
-    <el-header class="header-container" height="70px">
-      <el-container class="header">
-        <h2>nextNotes</h2>
+  <el-header class="header">
+    <el-row :gutter="20">
+      <el-col :md="{span: 4}">
+        <h2>Next Notes</h2>
+      </el-col>
+      <el-col :md="{span: 5}">
+        <h4>{{ this.$store.state.credentials.instance }}</h4>
+      </el-col>
+      <el-col :md="{span: 10}" />
+      <el-col :md="{span: 3}">
         <div>
-          <i class="el-icon-moon" v-if="!theme" />
-          <i class="el-icon-sunny" v-if="theme" />
-          <el-switch
-            v-model="theme"
-            class="theme-switch"
-            @change="changeTheme"
-          />
-          <el-select v-model="locale">
-            <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-            </el-option>
-          </el-select>
-          <el-button type="primary" class="logout-btn" @click="$emit('logOut')">
-            {{ $t("actions.logout") }}
+          <Settings />
+        </div>
+      </el-col>
+      <el-col :md="{span: 2}">
+        <div>
+          <el-button v-if="this.$store.state.loggedIn" v-on:click="logOut" type="primary">
+            {{ $t("header_component.logout_btn") }}
           </el-button>
         </div>
-      </el-container>
-    </el-header>
-  </div>
+    </el-col>
+    </el-row>
+  </el-header>
 </template>
 
 <script>
-//import { ipcRenderer } from "electron";
-
-import i18n from "@/i18n";
+import Settings from './Settings';
+import { ipcRenderer } from "electron";
 
 export default {
-  name: "Header",
-  data() {
-    return {
-      theme: true,
-      options: [],
-      locale: 'en'
-    };
+  name: 'Header',
+  components: {
+    Settings
   },
-
   methods: {
-    changeTheme: function () {
-      window.location.reload();
+    logOut: function () {
+      ipcRenderer.invoke("delete-account", `${this.$store.state.credentials.username}|${this.$store.state.credentials.url}`)
+          .then(async (res) => {
+              if(!res) {
+                this.$store.commit("triggerError", {
+                  message: "Err",
+                  timeout: 3000
+                });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+              this.$store.commit("triggerError", {
+                message: "Err",
+                timeout: 3000
+              });
+            })
+          .catch((err) => console.log(err));
+      this.$store.commit('setKeep', false);
+      this.$store.commit('changeLogStatus');
     }
-  },
-
-  watch: {
-    theme: function () {
-      window.localStorage.setItem("theme", this.theme);
-      if (!this.theme) {
-        import("element-theme-dark");
-      } else {
-        import("element-theme-chalk");
-      }
-    },
-    locale: async function () {
-      i18n.locale = this.locale;
-      await window.localStorage.setItem("locale", this.locale);
-    }
-  },
-
-  mounted: async function () {
-    const locales = i18n.availableLocales;
-    let options = [];
-    locales.map((item) => {
-      options.push({
-        value: item,
-        label: item
-      });
-    });
-    this.options = options;
-
-    if(await localStorage.getItem("locale")) {
-      this.locale = await localStorage.getItem("locale");
-    } else this.locale = options[0].value;
-    if (await window.localStorage.getItem("theme")) {
-      this.theme = await window.localStorage.getItem("theme") === "true";
-    }
-  },
-};
+  }
+}
 </script>
 
-<style lang="scss" scoped>
-
-.header-container {
-  border-bottom: solid;
-  border-color: #dcdfe6;
-  border-width: 1px;
-  border-radius: 0px;
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+.el-row {
+  height: 100%;
+  width: 100%;
 }
 
-.theme-switch {
-  margin-right: 20px;
-  margin-left: 20px;
-}
-
-.header {
+.el-col {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  justify-content: end;
   align-items: center;
-  justify-content: space-between;
+  div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
 }
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
 
-.logout-btn {
-  height: 40px;
+  .right-container {
+    width: 30%;
+    height: 70%;
+  }
+
+  .el-button {
+    height: 65%;
+  }
 }
-
-.el-select {
-  width: 70px;
-  margin-right: 20px;
-}
-
 </style>

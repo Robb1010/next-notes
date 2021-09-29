@@ -1,136 +1,179 @@
 <template>
-  <div>
-    <el-aside class="aside" width="230px">
-      <p class="new-category unselectable" @click="dialogVisible = true">
-        <span>{{ $t("aside.new_category") }}</span> <span class="plus"> + </span>
-      </p>
-      <el-menu :default-active="defaultOpen">
-        <el-submenu index="-1" class="unselectable">
-          <template slot="title"> {{ $t("aside.favorites") }} </template>
-          <template v-for="(note, index) in notes">
-            <el-menu-item
-              @click="menuClick(note, index)"
+<el-aside width="220px" class="aside">
+  <el-dialog
+      title="New category"
+      :visible.sync="categoryVisible"
+      width="30%">
+    <el-input
+        :placeholder="$t('aside_component.category_name')"
+        v-model="categoryName"
+        @keyup.enter.native="newCategory"
+    />
+    <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="newCategory">Confirm</el-button>
+  </span>
+  </el-dialog>
+  <p class="new-category" @click="categoryVisible = true">{{ $t("aside_component.new_category") }}&nbsp;&nbsp;&nbsp;+</p>
+  <el-menu :default-openeds="layout">
+    <el-submenu index="1">
+      <template slot="title"> {{ $t("aside_component.favorites") }} </template>
+      <el-menu-item-group >
+        <template v-for="(id, index) in favorites">
+          <el-menu-item
               :index="'item-' + index"
-              v-if="note.favorite"
+              :key="index"
+              v-html="$store.state.notes[id].title"
+              @click="clickNote(id)"
+          />
+        </template>
+      </el-menu-item-group>
+    </el-submenu>
+    <el-submenu index="2">
+      <template slot="title"> {{ $t("aside_component.unassigned") }} </template>
+      <el-menu-item-group>
+        <template slot="title">
+          <div class="new-note" @click="createNote('')">
+            {{ $t("aside_component.new_note") }}&nbsp;&nbsp;&nbsp;+
+          </div>
+        </template>
+        <template v-for="(note, index) in this.$store.state.notes">
+          <el-menu-item
+              v-if="note.category === ''"
+              :index="'item-' + index"
               :key="index"
               v-html="note.title"
-              class="unselectable"
-            />
+              @click="clickNote(note.id)"
+          />
+        </template>
+      </el-menu-item-group>
+    </el-submenu>
+    <template v-for="(category, index) in categories">
+      <el-submenu :index="(index + 3).toString()" :key="index">
+        <template slot="title"> {{ category }} </template>
+        <el-menu-item-group>
+          <template slot="title">
+            <div class="new-note" @click="createNote(category)">
+              {{ $t("aside_component.new_note") }}&nbsp;&nbsp;&nbsp;+
+            </div>
           </template>
-        </el-submenu>
-        <el-submenu
-          :index="index.toString()"
-          v-for="(category, index) in categories"
-          :key="index"
-          class="unselectable"
-        >
-          <template slot="title" class="unselectable">
-            {{ category === "" ? $t("aside.unassigned") : category }}</template
-          >
-          <el-menu-item-group>
-            <template slot="title">
-              <div class="add-note" @click="newNote(category)">
-                <span class="unselectable">{{ $t("aside.new_note") }}</span> <span class="plus unselectable"> + </span>
-              </div>
-            </template>
-            <template v-for="(note, index) in notes">
-              <el-menu-item
-                @click="menuClick(note, index)"
-                :index="'item-' + index"
-                v-if="note.category === category"
-                :key="index"
-                v-html="note.title"
-                class="unselectable"
-              />
-            </template>
-          </el-menu-item-group>
-        </el-submenu>
-      </el-menu>
-    </el-aside>
-    <el-dialog
-      :title="$t('aside.add_category')"
-      :visible.sync="dialogVisible"
-      width="30%"
-      class="unselectable"
-    >
-      <el-input
-        :placeholder="$t('aside.category_name')"
-        v-model="newCategory"
-        @keyup.enter.native="addCategory"
-      />
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">{{ $t("actions.cancel") }}</el-button>
-        <el-button type="primary" @click="addCategory">{{ $t("actions.confirm") }}</el-button>
-      </span>
-    </el-dialog>
-  </div>
+          <template v-for="(note) in notes">
+            <el-menu-item
+              v-if="note.category === category"
+              :index="'item-' + note.id"
+              :key="note.id"
+              v-html="note.title"
+              @click="clickNote(note.id)"
+            ></el-menu-item>
+          </template>
+        </el-menu-item-group>
+      </el-submenu>
+    </template>
+  </el-menu>
+</el-aside>
 </template>
 
 <script>
+import { setLayout, getLayout } from '../helpers/localstorageoperations';
+import { ipcRenderer } from "electron";
+
 export default {
   name: "Aside",
-  props: ["categories", "notes"],
-
   data() {
     return {
-      dialogVisible: false,
-      newCategory: "",
-      defaultOpen: "menu-0",
-      notesSize: 0,
-    };
+      notes: this.$store.state.notes,
+      layout: ['1'],
+      categories: this.$store.state.categories,
+      categoryName: '',
+      categoryVisible: false,
+      favorites: this.$store.getters.favorites
+    }
   },
-
   methods: {
-    newNote: function (category) {
-      const element = document.getElementsByClassName("is-active el-menu-item");
-      if (element[0]) {
-        element[0].classList.remove("is-active");
-      }
-      this.$emit("newNote", category);
-      this.defaultOpen = "item-0";
+    clickNote(noteId) {
+      this.$store.commit('setCurrent', noteId);
     },
-
-    closeDialog: function () {
-      this.dialogVisible = false;
-      this.newCategory = "";
+    async createNote(category) {
+      this.$store.commit("setNoteLoading", true);
+      await ipcRenderer.invoke("new-note",
+          this.$store.state.credentials,
+          category)
+      .then(async res => {
+          if (res.error) {
+            await this.$store.dispatch("triggerError", {
+              message: this.$t("errors.new_note"),
+              timeout: 3000
+            });
+          } else {
+            // Success
+            await this.$store.commit("createNote", res);
+            if(this.categories.indexOf(category) < 0 && category !== "") {
+              this.categories = [...this.categories, category];
+            }
+            this.$store.commit("setCurrent", res.id);
+          }
+      })
+      .catch(async err => {
+        console.log(err);
+        await this.$store.dispatch("triggerError", {
+          message: this.$t("errors.new_note"),
+          timeout: 3000
+        });
+      });
+      this.$store.commit("setNoteLoading", false);
     },
-
-    addCategory: function () {
-      this.dialogVisible = false;
-      this.$emit("newCategory", this.newCategory);
-      this.newCategory = "";
-    },
-
-    menuClick: function (note, index) {
-      localStorage.defaultOpen = `item-${index}`;
-      localStorage.activeId = note.id;
-      this.$emit("option", note, index);
-      this.defaultOpen = `item-${index}`;
-    },
+    newCategory() {
+      this.createNote(this.categoryName);
+      this.categoryVisible = false;
+      this.categoryName = '';
+    }
   },
 
-  mounted() {
-    if (localStorage.defaultOpen) {
-      this.defaultOpen = localStorage.defaultOpen;
+  computed: {
+    watchNotes() {
+      return this.$store.state.noteLoading;
+    },
+    watchCategories() {
+      return this.$store.state.categories;
+    },
+    watchFavorites() {
+      return this.$store.state.favorites;
     }
   },
 
   watch: {
-    notes: function () {
-      if (this.noteSize === 0) {
-        this.noteSize = this.notes.length;
-      } else if (this.noteSize < this.notes.length) {
-        this.defaultOpen = "item-0";
-        localStorage.defaultOpen = "0";
-      } else if (this.noteSize > this.notes.length) {
-        this.defaultOpen = "-1";
-        localStorage.defaultOpen = "-1";
-      }
-
-      this.noteSize = this.notes.length;
+    async watchNotes() {
+      this.notes = {};
+      this.notes = await this.$store.state.notes;
     },
+    async watchCategories() {
+      this.notes = {};
+      this.notes = await this.$store.state.notes;
+      this.categories = await this.$store.state.categories;
+    },
+    async watchFavorites() {
+      this.favorites = this.$store.state.favorites;
+    }
   },
-};
+  mounted: async function () {
+    await this.$store.commit("updateCategories");
+    const memLayout = await getLayout();
+    if(memLayout) {
+      this.layout = memLayout;
+    }
+    const categories = document.getElementsByClassName("el-submenu");
+    [].map.call(categories, function (category) {
+      category.onclick = function () {
+        let layout = [];
+        [].map.call(categories, function(category) {
+          if(category.classList.contains("is-opened")) {
+            layout.push(([].indexOf.call(categories, category) + 1).toString());
+          }
+        });
+        setLayout(layout);
+      }
+    });
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -156,39 +199,33 @@ export default {
 }
 
 .aside {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  text-align: left;
   border-right-style: solid;
   border-width: 1px;
   border-color: #dcdfe6;
-  height: calc(100vh - 70px);
-}
+  height: calc(100vh - 60px);
 
-.el-menu:not(.el-menu--collapse) {
-  width: 200px;
-}
+  ul {
+    border-right: none;
+  }
 
-ul {
-  border-right: none;
-}
+  .new-category {
+    font-size: 15px;
+    margin-left: 20px;
+  }
 
-.new-category {
-  font-size: 0.9rem;
-  padding-left: 20px;
-  color: #909399;
-}
+  .new-category, .new-note {
+    cursor: pointer;
+  }
 
-.plus {
-  font-size: 1.2rem;
-  margin-left: 10px;
-}
-
-.add-note {
-  display: flex;
-  align-items: center;
-}
-
-.add-note:hover,
-.new-category:hover {
-  cursor: pointer;
-  color: #409eff;
+  .new-category:hover, .new-note:hover {
+    color: #409eff;
+  }
 }
 </style>

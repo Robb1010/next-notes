@@ -1,78 +1,53 @@
 <template>
-<div id="app">
-  <Login />
-</div>
+  <div id="app">
+    <Header />
+    <template v-if="!this.$store.state.loggedIn">
+      <Login v-if="this.showLogin" />
+    </template>
+
+    <Main v-if="this.$store.state.loggedIn" />
+  </div>
 </template>
 
 <script>
 import Login from './components/Login.vue'
+import Header from './components/Header.vue'
 import Main from './components/Main.vue'
-import i18n from "@/i18n";
-
-const routes = {
-  '/': Login,
-  '/app': Main
-}
 
 export default {
+  name: 'App',
   components: {
-    Login
+    Login,
+    Main,
+    Header
   },
-  name: 'app',
   data() {
     return {
-      currentRoute: window.location.pathname
+      showLogin: false,
     }
   },
-
-  computed: {
-    ViewComponent() {
-      return routes[this.currentRoute] || Login
-    }
-  },
-
-  mounted: function () {
-    localStorage.getItem("locale") ? i18n.locale = localStorage.getItem("locale") : null;
-  },
-
-  render() {
-    return this.ViewComponent
+  mounted: function() {
+      setTimeout(() => {
+        // This short delay is needed in order to make sure that the localization settings are loaded first;
+        // The login form loads the errors / warning only once on render, so the delay will allow to grab them for the correct language
+        this.showLogin = true;
+      }, 100);
   }
 }
 </script>
 
 <style lang="scss">
-$--font-path: '~element-ui/lib/theme-chalk/fonts';
-@import "~element-ui/packages/theme-chalk/src/index";
-
 body {
-  margin: 0 !important;
+  padding: 0;
+  margin: 0;
 }
-
-.unselectable {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-table,
-td,
-th {
-  padding: 10px;
-  margin: 20px;
-  border-collapse: collapse;
-  border: 1px solid #606266;
-}
-
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  margin: 0;
-  padding: 0;
+  text-align: center;
+  overflow-x: hidden;
 }
-
 </style>

@@ -2,24 +2,19 @@
   "login_page": {
     "login": "Login",
     "username": "username",
-    "keep_signed_in": "Keep me signed in"
+    "keep_signed_in": "Keep me signed in",
+    "instance": "yourinstance.domain",
+    "password": "password"
   },
-  "aside": {
-    "new_category": "New category",
+  "header_component": {
+    "logout_btn": "Logout"
+  },
+  "aside_component": {
     "favorites": "Favorites",
     "unassigned": "Unassigned",
-    "new_note": "Create a new note",
-    "add_category": "Add new category",
+    "new_note": "New note",
+    "new_category": "New category",
     "category_name": "Category name"
-  },
-  "main": {
-    "edit_title": "Edit title",
-    "add_favorite": "Add to favorites",
-    "remove_favorite": "Remove from favorites",
-    "connection_error": "There seems to be an issue with your connection",
-    "delete_confirmation": "Are you sure to delete this?",
-    "views": "Cycle through views",
-    "save": "Save to cloud"
   },
   "editor": {
     "input": "Please input"
@@ -29,12 +24,25 @@
     "confirm": "Confirm",
     "yes": "Yes",
     "no": "No",
-    "logout": "Logout"
+    "logout": "Logout",
+    "close": "Close",
+    "delete_confirmation": "Are you sure you want to delete this note?",
+    "add_favorite": "Add to favorites",
+    "remove_favorite": "Remove from favorites",
+    "views": "Cycle through views",
+    "edit_title": "Edit title"
   },
   "errors": {
     "invalid_credentials": "Invalid credentials",
     "instance_link": "Please provide an instance link",
     "fill_username": "Please fill in your username",
-    "fill_password": "Please fill in your password"
+    "fill_password": "Please fill in your password",
+    "new_note": "Error creating new note",
+    "delete_note": "Error deleting note"
+  },
+  "settings": {
+    "settings": "Settings",
+    "theme": "Theme",
+    "language": "Language"
   }
 }

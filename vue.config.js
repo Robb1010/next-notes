@@ -8,11 +8,12 @@ module.exports = {
       builderOptions: {
         appId: 'com.electron.nextnotes',
         productName: 'Next Notes',
+        icon: 'public/assets/icon.png',
         mac: {
-          icon: 'public/build/icon.icns'
+          icon: 'public/assets/icon.icns'
         },
         win: {
-          icon: 'public/build/icon.ico'
+          icon: 'public/assets/icon.ico'
         }
       }
     },
@@ -20,7 +21,7 @@ module.exports = {
       locale: 'en',
       fallbackLocale: 'en',
       localeDir: 'locales',
-      enableInSFC: false
+      enableInSFC: true
     }
   }
 }

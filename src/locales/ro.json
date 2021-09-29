@@ -2,24 +2,20 @@
   "login_page": {
     "login": "Autentificare",
     "username": "utilizator",
-    "keep_signed_in": "Păstrează-mă autentificat(ă)"
+    "keep_signed_in": "Păstrează-mă autentificat(ă)",
+    "instance": "instanță.domeniu",
+    "password": "parolă"
   },
-  "aside": {
+  "header_component": {
+    "logout_btn": "Ieșire"
+  },
+  "aside_component": {
     "new_category": "Categorie nouă",
     "favorites": "Favorite",
     "unassigned": "Fără categorie",
     "new_note": "Creează o nouă notă",
     "add_category": "Adaugă o nouă categorie",
     "category_name": "Nume categorie"
-  },
-  "main": {
-    "edit_title": "Editează titlu",
-    "add_favorite": "Adaugă la favorite",
-    "remove_favorite": "Șterge de la favorite",
-    "connection_error": "Probleme cu conexiunea la server",
-    "delete_confirmation": "Ești sigur(ă) că vrei să ștergi?",
-    "views": "Schimbă modul de vizualizare",
-    "save": "Salvează"
   },
   "editor": {
     "input": "Scrie..."
@@ -29,12 +25,25 @@
     "confirm": "Confirmă",
     "yes": "Da",
     "no": "Nu",
-    "logout": "Ieșire"
+    "logout": "Ieșire",
+    "close": "Închide",
+    "delete_confirmation": "Ești sigur(ă) că vrei să ștergi?",
+    "add_favorite": "Adaugă la favorite",
+    "remove_favorite": "Șterge de la favorite",
+    "views": "Schimbă modul de vizualizare",
+    "edit_title": "Editează titlu"
   },
   "errors": {
     "invalid_credentials": "Detalii autentificare invalide",
     "instance_link": "Scrieți un link pentru instanța Nextcloud",
     "fill_username": "Scrieți un nume utilizator",
-    "fill_password": "Scrieți parola"
+    "fill_password": "Scrieți parola",
+    "new_note": "Error creating new note",
+    "delete_note": "Error deleting note"
+  },
+  "settings": {
+    "settings": "Setări",
+    "theme": "Temă",
+    "language": "Limbă"
   }
 }

@@ -9,11 +9,18 @@ export default {
   components: {},
   name: "MDViewer",
   props: ["content", "scrollTo"],
+  data() {
+    return {
+      text: "sdfdsfds"
+    }
+  },
 
   computed: {
     mdToHTML: function () {
-      return marked(this.content);
-    },
+      if(this.$store.state.editorVisibility) {
+        return marked(this.content);
+      } else return marked(this.$store.getters.note(this.$store.getters.current).content);
+    }
   },
 
   watch: {
@@ -21,12 +28,13 @@ export default {
       const reader = document.getElementById("reader");
       const targetPos = (this.scrollTo * reader.scrollHeight) / 100;
       reader.scrollTo(0, targetPos);
-    },
+    }
   },
 };
 </script>
 
 <style scoped lang="scss">
+
 ::-webkit-scrollbar {
   width: 4px;
   -webkit-border-radius: 4px;
@@ -49,6 +57,8 @@ export default {
 }
 
 .el-main {
-  height: calc(100vh - 70px - 50px);
+  height: calc(100vh - 60px - 60px);
+  wrap: break-word;
+  text-align: left;
 }
 </style>
