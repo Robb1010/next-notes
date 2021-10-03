@@ -1,7 +1,7 @@
 <template>
 <el-aside width="220px" class="aside">
   <div class="search-box">
-    <el-input v-model="search" placeholder="Search..." class="search"></el-input>
+    <el-input v-model="search" :placeholder="$t('aside_component.search')" class="search"></el-input>
   </div>
 
   <el-dialog

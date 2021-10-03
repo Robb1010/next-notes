@@ -15,7 +15,8 @@
     "unassigned": "Fără categorie",
     "new_note": "Creează o nouă notă",
     "add_category": "Adaugă o nouă categorie",
-    "category_name": "Nume categorie"
+    "category_name": "Nume categorie",
+    "search": "Caută"
   },
   "editor": {
     "input": "Scrie..."

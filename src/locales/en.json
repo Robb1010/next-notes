@@ -14,7 +14,8 @@
     "unassigned": "Unassigned",
     "new_note": "New note",
     "new_category": "New category",
-    "category_name": "Category name"
+    "category_name": "Category name",
+    "search": "Search"
   },
   "editor": {
     "input": "Please input"
