@@ -36,13 +36,13 @@
             {{ $t("aside_component.new_note") }}&nbsp;&nbsp;&nbsp;+
           </div>
         </template>
-        <template v-for="(note, index) in this.$store.state.notes">
+        <template v-for="(id, index) in notesArr">
           <el-menu-item
-              v-if="note.category === ''"
+              v-if="$store.state.notes[id].category === ''"
               :index="'item-' + index"
               :key="index"
-              v-html="note.title"
-              @click="clickNote(note.id)"
+              v-html="$store.state.notes[id].title"
+              @click="clickNote(id)"
           />
         </template>
       </el-menu-item-group>
@@ -56,13 +56,13 @@
               {{ $t("aside_component.new_note") }}&nbsp;&nbsp;&nbsp;+
             </div>
           </template>
-          <template v-for="(note) in notes">
+          <template v-for="(id) in notesArr">
             <el-menu-item
-              v-if="note.category === category"
-              :index="'item-' + note.id"
-              :key="note.id"
-              v-html="note.title"
-              @click="clickNote(note.id)"
+              v-if="$store.state.notes[id].category === category"
+              :index="'item-' + id"
+              :key="id"
+              v-html="$store.state.notes[id].title"
+              @click="clickNote(id)"
             ></el-menu-item>
           </template>
         </el-menu-item-group>
@@ -85,7 +85,8 @@ export default {
       categories: this.$store.state.categories,
       categoryName: '',
       categoryVisible: false,
-      favorites: this.$store.getters.favorites
+      favorites: this.$store.getters.favorites,
+      notesArr: this.$store.state.notesArr
     }
   },
   methods: {
@@ -109,6 +110,7 @@ export default {
             if(this.categories.indexOf(category) < 0 && category !== "") {
               this.categories = [...this.categories, category];
             }
+            this.$store.commit("updateNotesArr");
             this.$store.commit("setCurrent", res.id);
           }
       })
@@ -120,11 +122,12 @@ export default {
         });
       });
       this.$store.commit("setNoteLoading", false);
-    },
+      },
     newCategory() {
       this.createNote(this.categoryName);
       this.categoryVisible = false;
       this.categoryName = '';
+      this.$store.commit("updateNotesArr");
     }
   },
 
@@ -137,24 +140,31 @@ export default {
     },
     watchFavorites() {
       return this.$store.state.favorites;
+    },
+    watchNotesArr() {
+      return this.$store.state.notesArr;
     }
   },
 
   watch: {
     async watchNotes() {
       this.notes = {};
-      this.notes = await this.$store.state.notes;
+      this.notes = this.$store.state.notes;
     },
     async watchCategories() {
       this.notes = {};
-      this.notes = await this.$store.state.notes;
-      this.categories = await this.$store.state.categories;
+      this.notes = this.$store.state.notes;
+      this.categories = this.$store.state.categories;
     },
     async watchFavorites() {
       this.favorites = this.$store.state.favorites;
+    },
+    async watchNotesArr() {
+      this.notesArr = this.$store.state.notesArr;
     }
   },
   mounted: async function () {
+    await this.$store.commit("updateNotesArr");
     await this.$store.commit("updateCategories");
     const memLayout = await getLayout();
     if(memLayout) {

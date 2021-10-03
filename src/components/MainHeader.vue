@@ -129,6 +129,7 @@ export default {
         } else {
           // Success
           await this.$store.commit("deleteNote", this.$store.state.current);
+          this.$store.commit("updateNotesArr");
         }
       });
       this.$store.commit("setCurrent", null);

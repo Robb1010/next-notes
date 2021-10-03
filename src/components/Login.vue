@@ -131,6 +131,7 @@ export default {
               this.error = true;
             } else {
               this.$store.commit("setNotes", res);
+              this.$store.commit("updateNotesArr");
               this.$store.commit("changeLogStatus");
               delete credentials["password"];
               this.$store.commit("setCredentials", credentials);

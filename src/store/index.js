@@ -9,6 +9,7 @@ export default new Vuex.Store({
     credentials: {},
     loggedIn: false,
     notes: {},
+    notesArr: [],
     categories: [],
     favorites: [],
     current: null,
@@ -43,7 +44,16 @@ export default new Vuex.Store({
           favorites.push(note[0]);
         }
       });
+      favorites.sort((a, b) => b - a);
       return favorites;
+    },
+    notesArr: state => {
+      let notesArr = [];
+      Object.entries(state.notes).forEach(note => {
+        notesArr.push(note[0]);
+      });
+      notesArr.sort((a, b) => b - a);
+      return notesArr;
     },
     note: state => (id) => {
       return state.notes[id];
@@ -61,7 +71,15 @@ export default new Vuex.Store({
     setNotes(state, notes) {
       notes.map(note => {
         state.notes[note.id] = note;
-      })
+      });
+    },
+    updateNotesArr: state => {
+      let notesArr = [];
+      Object.entries(state.notes).forEach(note => {
+        notesArr.push(note[0]);
+      });
+      notesArr.sort((a, b) => b - a);
+      state.notesArr = notesArr;
     },
     updateNote(state, note) {
       state.notes[note.id] = note;
@@ -96,6 +114,7 @@ export default new Vuex.Store({
     deleteNote(state, noteId) {
       state.categories = [];
       delete state.notes[noteId];
+      state.notesArr.splice(state.notesArr.indexOf(noteId), 1);
       Object.entries(state.notes).forEach(note => {
         if (note[1].category !== "" && !state.categories.includes(note[1].category)) {
           state.categories.push(note[1].category);
