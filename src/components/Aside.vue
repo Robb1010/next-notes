@@ -1,5 +1,9 @@
 <template>
 <el-aside width="220px" class="aside">
+  <div class="search-box">
+    <el-input v-model="search" placeholder="Search..." class="search"></el-input>
+  </div>
+
   <el-dialog
       title="New category"
       :visible.sync="categoryVisible"
@@ -86,7 +90,9 @@ export default {
       categoryName: '',
       categoryVisible: false,
       favorites: this.$store.getters.favorites,
-      notesArr: this.$store.state.notesArr
+      notesArr: this.$store.state.notesArr,
+      search: '',
+      oldLayout: []
     }
   },
   methods: {
@@ -161,6 +167,36 @@ export default {
     },
     async watchNotesArr() {
       this.notesArr = this.$store.state.notesArr;
+    },
+    async search() {
+      if(this.search.length === 0) {
+        this.favorites = this.$store.getters.favorites;
+        this.notesArr = this.$store.state.notesArr;
+        this.layout = this.oldLayout;
+        this.oldLayout = [];
+      } else {
+        if(this.oldLayout.length === 0) {
+          this.oldLayout = await getLayout();
+        }
+        this.favorites = this.$store.getters.favorites;
+        this.notesArr = this.$store.state.notesArr;
+        const noOfCategories = this.categories.length + 2;
+        let layout = [];
+        for(let i = 1; i <= noOfCategories; i++) {
+          layout.push(i.toString());
+        }
+        this.layout = layout;
+        this.favorites = this.favorites.filter(id => {
+           if (this.$store.state.notes[id].title.toLowerCase().includes(this.search.toLowerCase())) {
+             return id;
+           }
+        });
+        this.notesArr = this.notesArr.filter(id => {
+          if (this.$store.state.notes[id].title.toLowerCase().includes(this.search.toLowerCase())) {
+            return id;
+          }
+        });
+      }
     }
   },
   mounted: async function () {
@@ -220,6 +256,15 @@ export default {
   border-width: 1px;
   border-color: #dcdfe6;
   height: calc(100vh - 60px);
+
+  .search-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .search {
+      width: 200px;
+    }
+  }
 
   ul {
     border-right: none;
