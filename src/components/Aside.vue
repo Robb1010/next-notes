@@ -82,6 +82,7 @@ import { ipcRenderer } from "electron";
 
 export default {
   name: "Aside",
+  props: ['newNoteCategory'],
   data() {
     return {
       notes: this.$store.state.notes,
@@ -153,6 +154,12 @@ export default {
   },
 
   watch: {
+    newNoteCategory: function() {
+      if(this.newNoteCategory !== null) {
+        this.createNote(this.newNoteCategory);
+      }
+    },
+
     async watchNotes() {
       this.notes = {};
       this.notes = this.$store.state.notes;
@@ -259,10 +266,11 @@ export default {
 
   .search-box {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
+    padding-left: 20px;
     .search {
-      width: 200px;
+      width: 160px;
     }
   }
 
